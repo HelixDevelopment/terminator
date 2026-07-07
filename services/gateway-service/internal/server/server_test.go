@@ -3,8 +3,11 @@ package server_test
 import (
 	"crypto/ed25519"
 	"encoding/base64"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"strings"
 	"testing"
 	"time"
 
@@ -18,6 +21,58 @@ import (
 
 func init() {
 	gin.SetMode(gin.TestMode)
+}
+
+// upstreamServiceNames mirrors the service names registered by
+// server.registerUpstreams (internal/server/server.go). Kept in sync
+// explicitly rather than exported, since these unit tests intentionally
+// stay decoupled from server-package internals.
+var upstreamServiceNames = []string{
+	"auth-service", "user-service", "vault-service", "host-service",
+	"ssh-proxy-service", "terminal-service", "sftp-service", "port-forward-service",
+	"snippet-service", "keychain-service", "workspace-service", "collaboration-service",
+	"notification-service", "audit-service", "analytics-service", "ai-service",
+	"recording-service", "pki-service", "org-service", "billing-service",
+	"config-service", "health-service", "container-bridge-service", "helixtrack-bridge-service",
+}
+
+// upstreamEnvKey derives the same env-var-override key the server itself
+// computes (envKeyForService in server.go), so tests can point every
+// registered upstream at a real, local, fake upstream server.
+func upstreamEnvKey(name string) string {
+	return strings.ToUpper(strings.ReplaceAll(name, "-", "_")) + "_ADDR"
+}
+
+// fakeUpstreamHandler is the REAL (network-listening, not in-process)
+// stand-in upstream used by the unit tests below. Since proxyTo now
+// performs a genuine reverse-proxy hop (no more stub), these tests need
+// a real listener to proxy to. It echoes back enough of the real,
+// received request (which service the gateway forwarded to it as, the
+// request id, method and path) so tests can assert the round trip really
+// happened.
+func fakeUpstreamHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprintf(w, `{"service":%q,"request_id":%q,"upstream_path":%q,"upstream_method":%q}`,
+		r.Header.Get("X-Gateway-Upstream"), r.Header.Get("X-Request-ID"), r.URL.Path, r.Method)
+}
+
+// TestMain starts one real, loopback-listening fake-upstream HTTP server
+// and points every registered gateway upstream at it via the
+// <SERVICE>_ADDR environment-variable override, before any test runs.
+// This keeps the pre-existing unit test suite green now that proxyTo
+// performs a real network hop instead of returning a stub.
+func TestMain(m *testing.M) {
+	gin.SetMode(gin.TestMode)
+
+	ts := httptest.NewServer(http.HandlerFunc(fakeUpstreamHandler))
+	for _, name := range upstreamServiceNames {
+		os.Setenv(upstreamEnvKey(name), ts.URL)
+	}
+
+	code := m.Run()
+	ts.Close()
+	os.Exit(code)
 }
 
 type testLogger struct{}
