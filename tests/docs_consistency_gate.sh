@@ -25,9 +25,21 @@
 # temp file, without ever touching the real corpus.
 set -euo pipefail
 
-# --- resolve repo root & corpus via git ------------------------------------
+# --- resolve repo root & corpus -------------------------------------------
+# This script always lives at exactly "<repo_root>/tests/docs_consistency_gate.sh",
+# so the repo root is the script's parent directory. Resolved this way
+# (pure path arithmetic) rather than via "git -C "$SCRIPT_DIR" rev-parse
+# --show-toplevel" deliberately: when this script runs from inside a git
+# pre-commit hook, git sets GIT_DIR (+ a relative GIT_WORK_TREE=".") in the
+# hook subprocess's environment; "git -C <subdir>" then chdir's into
+# SCRIPT_DIR BEFORE git re-resolves the now-stale relative GIT_WORK_TREE,
+# so it incorrectly reports SCRIPT_DIR itself as the repo top-level
+# (reproduced directly: GIT_DIR set + GIT_WORK_TREE=. + `git -C tests
+# rev-parse --show-toplevel` returns ".../tests" instead of the real root).
+# Pure path arithmetic sidesteps that git worktree-environment footgun
+# entirely.
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
-REPO_ROOT="$(git -C "$SCRIPT_DIR" rev-parse --show-toplevel)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." >/dev/null 2>&1 && pwd)"
 CORPUS_DIR="$REPO_ROOT/docs/research/mvp/output/docs/markdown"
 
 DUP_WINDOW=40
