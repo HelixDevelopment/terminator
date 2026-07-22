@@ -37,6 +37,11 @@ import (
 type Claims struct {
 	UserID string `json:"userId"`
 	OrgID  string `json:"orgId,omitempty"`
+	// TokenType distinguishes an access token from a refresh token
+	// (HEL-001). auth-service signs BOTH with the same Ed25519 key, so the
+	// signature alone cannot tell them apart — this claim is the only
+	// thing that can. Enforced in validateToken.
+	TokenType string `json:"tokenType"`
 	jwt.RegisteredClaims
 }
 
@@ -273,6 +278,26 @@ func (s *Server) validateToken(tokenString string) (*Claims, error) {
 	claims, ok := token.Claims.(*Claims)
 	if !ok {
 		return nil, fmt.Errorf("invalid claims type")
+	}
+
+	// HEL-001: reject any token that is not an ACCESS token.
+	//
+	// auth-service signs access tokens AND refresh tokens with the SAME
+	// Ed25519 private key (services/auth-service/internal/crypto/
+	// crypto.go), so every check above this line — signing method,
+	// signature, expiry, claims shape — passes identically for both.
+	// The authMiddleware's separate `UserID == ""` check does NOT stop a
+	// refresh token: auth-service populates userId on refresh tokens too.
+	// Without this guard a stolen OR ALREADY-REVOKED refresh token
+	// authenticates as an access token for its much longer lifetime,
+	// bypassing the /refresh endpoint's hash-check and revocation seam.
+	//
+	// Strict equality against "access" (rather than "!= refresh") is
+	// deliberate: auth-service populates TokenType on every token it
+	// issues, so an empty or unrecognised type is not a legitimate access
+	// token from this issuer.
+	if claims.TokenType != "access" {
+		return nil, fmt.Errorf("invalid token type: access token required")
 	}
 
 	return claims, nil

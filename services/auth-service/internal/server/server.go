@@ -365,6 +365,27 @@ func (s *Server) jwtValidationMiddleware() gin.HandlerFunc {
 			return
 		}
 
+		// HEL-001: reject any token that is not an ACCESS token.
+		//
+		// This manager signs access AND refresh tokens with the SAME
+		// Ed25519 key, so ValidateToken above accepts both. The routes
+		// behind this middleware (/logout, /mfa/setup, /me) are
+		// access-token routes.
+		//
+		// The IsAccessTokenActive revocation check below is NOT a
+		// substitute: it resolves to a session lookup keyed on
+		// access_token_hash, which a refresh token misses only when a
+		// database is present — and it returns true unconditionally when
+		// h.repo == nil, so in the no-database configuration it fails
+		// OPEN and admits the refresh token outright. The token's
+		// declared type is the correct place to decide this, and it
+		// holds in every configuration.
+		if claims.TokenType != "access" {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid token type: access token required"})
+			c.Abort()
+			return
+		}
+
 		// JWT signature validation alone is stateless: a token revoked
 		// by a prior /logout still verifies cryptographically until it
 		// naturally expires. Reject it here too so a replayed,

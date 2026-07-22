@@ -921,6 +921,27 @@ func (s *Server) validateToken(tokenString string) (*Claims, error) {
 		return nil, fmt.Errorf("invalid claims type")
 	}
 
+	// HEL-001: reject any token that is not an ACCESS token.
+	//
+	// auth-service signs access tokens AND refresh tokens with the SAME
+	// Ed25519 private key (services/auth-service/internal/crypto/
+	// crypto.go: GenerateAccessTokenWithExpiry sets TokenType "access",
+	// GenerateRefreshToken sets TokenType "refresh"). Every check above
+	// this line — signing method, signature, expiry, claims shape —
+	// passes identically for both, so without this guard a refresh token
+	// authenticates as an access token. That would let a stolen OR
+	// ALREADY-REVOKED refresh token reach protected routes for its much
+	// longer lifetime, bypassing the /refresh endpoint's hash-check and
+	// revocation seam entirely.
+	//
+	// The comparison is deliberately strict equality against "access"
+	// rather than "!= refresh": auth-service populates TokenType on every
+	// token it issues, so an empty or unrecognised type is not a
+	// legitimate access token from this issuer and must not be admitted.
+	if claims.TokenType != "access" {
+		return nil, fmt.Errorf("invalid token type: access token required")
+	}
+
 	return claims, nil
 }
 

@@ -546,6 +546,22 @@ func (h *Handler) ValidateToken(c *gin.Context) {
 		return
 	}
 
+	// HEL-001: a refresh token is signed with the SAME Ed25519 key as an
+	// access token, so ValidateToken above accepts it. This endpoint
+	// answers "is this a usable access token?" — its response carries
+	// userId/orgId/permissions and callers treat valid=true as an
+	// authentication decision. Reporting a refresh token as valid here
+	// hands out an access decision for a token that must only ever be
+	// spent at /refresh, bypassing that endpoint's stored-hash check and
+	// revocation seam.
+	//
+	// Refresh tokens are still validated on their own path: RefreshToken
+	// above requires TokenType == "refresh".
+	if claims.TokenType != "access" {
+		c.JSON(http.StatusOK, model.ValidateTokenResponse{Valid: false})
+		return
+	}
+
 	c.JSON(http.StatusOK, model.ValidateTokenResponse{
 		Valid:       true,
 		UserID:      claims.UserID,

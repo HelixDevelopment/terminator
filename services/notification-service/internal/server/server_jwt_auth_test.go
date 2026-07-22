@@ -71,6 +71,10 @@ import (
 type gatewayClaims struct {
 	UserID string `json:"userId"`
 	OrgID  string `json:"orgId,omitempty"`
+	// HEL-001: auth-service stamps a tokenType on every token it issues,
+	// and validateToken now requires tokenType=="access". A fixture
+	// without it was never a faithful model of a real access token.
+	TokenType string `json:"tokenType"`
 	jwt.RegisteredClaims
 }
 
@@ -98,8 +102,9 @@ func mustSetJWTPublicKey(t *testing.T) func(userID, orgID string) string {
 
 	return func(userID, orgID string) string {
 		claims := gatewayClaims{
-			UserID: userID,
-			OrgID:  orgID,
+			UserID:    userID,
+			OrgID:     orgID,
+			TokenType: "access", // HEL-001: mint what auth-service really mints
 			RegisteredClaims: jwt.RegisteredClaims{
 				ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour)),
 				IssuedAt:  jwt.NewNumericDate(time.Now()),
@@ -190,6 +195,12 @@ func TestT11JWTAuth_RejectsWrongKeySignedToken(t *testing.T) {
 	require.NoError(t, err)
 	claims := gatewayClaims{
 		UserID: uuid.New().String(),
+		// HEL-001: this token is otherwise perfectly well-formed — including
+		// a valid access tokenType — so the ONLY reason it can be rejected
+		// is the untrusted signature this test exists to prove is caught.
+		// Omitting tokenType would let the new type guard reject it first
+		// and the test would pass for the wrong reason (§11.4.201).
+		TokenType: "access",
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour)),
 		},

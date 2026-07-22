@@ -62,6 +62,10 @@ import (
 type t18Claims struct {
 	UserID string `json:"userId"`
 	OrgID  string `json:"orgId,omitempty"`
+	// HEL-001: auth-service stamps a tokenType on every token it issues,
+	// and validateToken now requires tokenType=="access". A fixture
+	// without it was never a faithful model of a real access token.
+	TokenType string `json:"tokenType"`
 	jwt.RegisteredClaims
 }
 
@@ -123,8 +127,9 @@ func t18MustNewServer(t *testing.T) (*server.Server, func(userID, orgID string) 
 
 	sign := func(userID, orgID string) string {
 		claims := t18Claims{
-			UserID: userID,
-			OrgID:  orgID,
+			UserID:    userID,
+			OrgID:     orgID,
+			TokenType: "access", // HEL-001: mint what auth-service really mints
 			RegisteredClaims: jwt.RegisteredClaims{
 				ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour)),
 				IssuedAt:  jwt.NewNumericDate(time.Now()),

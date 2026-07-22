@@ -36,6 +36,12 @@ func generateTestToken(t *testing.T, signingKey ed25519.PrivateKey, userID, orgI
 	claims := server.Claims{
 		UserID: userID,
 		OrgID:  orgID,
+		// HEL-001: auth-service stamps a tokenType on EVERY token it
+		// issues, so a fixture without one was never a faithful model of a
+		// real access token. Now that validateToken enforces
+		// tokenType=="access", the fixture states explicitly what it always
+		// implicitly claimed to be.
+		TokenType: "access",
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().UTC().Add(time.Hour)),
 			IssuedAt:  jwt.NewNumericDate(time.Now().UTC()),
