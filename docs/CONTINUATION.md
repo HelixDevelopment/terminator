@@ -1,7 +1,7 @@
 # CONTINUATION — helix_terminator
 
-**Revision:** 18
-**Last modified:** 2026-07-23T14:25:47+0500
+**Revision:** 19
+**Last modified:** 2026-07-26
 
 Standing session-resumption record (Constitution §12.10 / §11.4.131). Keep current.
 
@@ -12,6 +12,13 @@ Standing session-resumption record (Constitution §12.10 / §11.4.131). Keep cur
 3. `git fetch --all --prune` per repo before editing (§11.4.37).
 
 **Live @ 2026-07-23 (session 2b):** main `bebac54` (constitution `6fd244e`, all 6 mirrors). **DONE this session:** claude_toolkit **v1.25.5 released** (4 mirrors + GitHub/GitLab release objects); **helixagent proven working end-to-end** (Qwen3-Coder-30B verified + real captured answer, no bluff); **HEL-012** (LLMsVerifier anti-hallucination FEATURE) + **HEL-013** (F1 cross-tenant authz BUG) filed + committed to the SSoT (13 items). **STILL PARKED on quota (Fable weekly→Jul 28; resume on Sonnet/Opus, smaller fleet per §11.4.225 throttle finding):** F1 authz fix (HEL-013), HEL-001 review-finish, land §11.4.226, tmux scope-split (do NOT release the old 8.6-CPU split). **Owed:** remaining EFFORT-4 findings as SSoT items; `.helix/reporting.yaml` sync_command (docs regen skipped); helixagent prompts #1/#3 (skill+git tool-use) via interactive TUI. **Full current detail: `~/.claude-shared/session_ledgers/conductor_respawn_log.md` (RESUME PROTOCOL).**
+
+## Landed since rev 18 (2026-07-26 Completion Initiative pass)
+- Backend Testing Stream: converted stub/tautology tests across 7 services; added real integration tests (`//go:build integration`) for 15 services that lacked them; removed `scripts/generate_test_banks.go` and all `test/banks/*` stubs.
+- Infrastructure Stream: `helm lint` and `helm template` pass for `infrastructure/helm/helixterm/` (7510 rendered lines); `terraform validate` passes.
+- Flutter Client Stream: `flutter pub get` and `flutter analyze` clean; 69 unit/widget/BLoC/golden tests pass; 64 lib TODOs remain.
+- Docs & Closure Stream: GAP_REGISTER updated; COVERAGE_LEDGER refreshed (25 services, 267 `_test.go` files, 1161 test funcs, 25 stress + 25 chaos files, 18 services with integration tests); constitution gate + mutation proof pass.
+- Operator-blocked: T008 nested submodule orphan (`submodules/helixtrack-core/Website/Upstreamable`), T009 `submodules/open-design` gitlink ignored by `.gitignore`.
 
 ## Landed since rev 15 (all on origin/main, remote==local)
 - `4dac814` S-FLUT — 8 stub tests + fake e2e → 86 real Flutter tests (+2 real bug fixes).

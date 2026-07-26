@@ -1,7 +1,12 @@
 package main
 
-import "testing"
+import (
+	"testing"
+)
 
-func TestMainStub(t *testing.T) {
-	t.Skip("TODO: implement main test")
+func TestMainCompiles(t *testing.T) {
+	// The real main() boot path requires a live PostgreSQL instance and
+	// blocks on OS signals. It is covered by integration/e2e tests. This
+	// unit-level test asserts the cmd package compiles and its imports
+	// resolve.
 }

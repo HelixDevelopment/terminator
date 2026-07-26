@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS audit_logs (
     resource_type VARCHAR(50) NOT NULL,
     resource_id UUID,
     details JSONB,
-    ip_address INET,
+    ip_address TEXT,
     user_agent TEXT,
     timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     severity VARCHAR(20) NOT NULL DEFAULT 'info'
