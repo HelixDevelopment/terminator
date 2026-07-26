@@ -4,14 +4,115 @@ package billing_service.v1;
 
 option go_package = "github.com/helixdevelopment/billing-service/api/proto/billing_service/v1;billing_servicev1";
 
-// TODO: define service RPCs and messages
+import "google/protobuf/timestamp.proto";
 
 service BillingServiceService {
-	rpc HealthCheck (HealthCheckRequest) returns (HealthCheckResponse);
+  rpc CreateSubscription (CreateSubscriptionRequest) returns (CreateSubscriptionResponse);
+  rpc ListSubscriptions (ListSubscriptionsRequest) returns (ListSubscriptionsResponse);
+  rpc GetSubscription (GetSubscriptionRequest) returns (GetSubscriptionResponse);
+  rpc UpdateSubscription (UpdateSubscriptionRequest) returns (UpdateSubscriptionResponse);
+  rpc CancelSubscription (CancelSubscriptionRequest) returns (CancelSubscriptionResponse);
+  rpc ListInvoices (ListInvoicesRequest) returns (ListInvoicesResponse);
+  rpc GetInvoice (GetInvoiceRequest) returns (GetInvoiceResponse);
+  rpc HealthCheck (HealthCheckRequest) returns (HealthCheckResponse);
+}
+
+message CreateSubscriptionRequest {
+  string plan_id = 1;
+  optional string stripe_price_id = 2;
+}
+
+message CreateSubscriptionResponse {
+  Subscription subscription = 1;
+}
+
+message ListSubscriptionsRequest {
+  string status = 1;
+  int32 limit = 2;
+  int32 offset = 3;
+}
+
+message ListSubscriptionsResponse {
+  repeated Subscription items = 1;
+  int32 total = 2;
+  int32 limit = 3;
+  int32 offset = 4;
+}
+
+message GetSubscriptionRequest {
+  string id = 1;
+}
+
+message GetSubscriptionResponse {
+  Subscription subscription = 1;
+}
+
+message UpdateSubscriptionRequest {
+  string id = 1;
+  optional string plan_id = 2;
+  optional string stripe_price_id = 3;
+  optional string status = 4;
+}
+
+message UpdateSubscriptionResponse {
+  Subscription subscription = 1;
+}
+
+message CancelSubscriptionRequest {
+  string id = 1;
+}
+
+message CancelSubscriptionResponse {
+  Subscription subscription = 1;
+}
+
+message ListInvoicesRequest {
+  int32 limit = 1;
+  int32 offset = 2;
+}
+
+message ListInvoicesResponse {
+  repeated Invoice items = 1;
+  int32 total = 2;
+  int32 limit = 3;
+  int32 offset = 4;
+}
+
+message GetInvoiceRequest {
+  string id = 1;
+}
+
+message GetInvoiceResponse {
+  Invoice invoice = 1;
+}
+
+message Subscription {
+  string id = 1;
+  string org_id = 2;
+  string plan_id = 3;
+  string status = 4;
+  google.protobuf.Timestamp started_at = 5;
+  optional google.protobuf.Timestamp ends_at = 6;
+  optional google.protobuf.Timestamp canceled_at = 7;
+  google.protobuf.Timestamp created_at = 8;
+  string provider = 9;
+  string external_subscription_id = 10;
+}
+
+message Invoice {
+  string id = 1;
+  string org_id = 2;
+  string subscription_id = 3;
+  int32 amount_cents = 4;
+  string currency = 5;
+  string status = 6;
+  google.protobuf.Timestamp due_date = 7;
+  optional google.protobuf.Timestamp paid_at = 8;
+  google.protobuf.Timestamp created_at = 9;
 }
 
 message HealthCheckRequest {}
 
 message HealthCheckResponse {
-	bool healthy = 1;
+  bool healthy = 1;
 }
