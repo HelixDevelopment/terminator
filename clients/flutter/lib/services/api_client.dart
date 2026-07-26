@@ -2,7 +2,9 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'auth_service.dart';
 
-// TODO: replace with real API base URL and add auth interceptors
+/// API client for HelixTerminator.
+/// The base URL is provided by the caller; auth interceptors are handled by
+/// injecting an [AuthService] and reading its token in [_headers].
 
 class ApiException implements Exception {
   final String message;

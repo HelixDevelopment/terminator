@@ -14,6 +14,25 @@ class PortForward {
     this.remoteHost = 'localhost',
     this.active = false,
   });
+  factory PortForward.fromJson(Map<String, dynamic> json) {
+    return PortForward(
+      id: json['id'] as String,
+      hostId: json['host_id'] as String,
+      localPort: json['local_port'] as int,
+      remotePort: json['remote_port'] as int,
+      remoteHost: json['remote_host'] as String,
+      active: json['active'] as bool,
+    );
+  }
 
-  // TODO: add fromJson, toJson
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'host_id': hostId,
+      'local_port': localPort,
+      'remote_port': remotePort,
+      'remote_host': remoteHost,
+      'active': active,
+    };
+  }
 }

@@ -35,7 +35,7 @@ spec:
         - name: {{ $serviceName }}
           securityContext:
             {{- toYaml $global.Values.containerSecurityContext | nindent 12 }}
-          image: "{{ $global.Values.global.imageRegistry }}{{ if $global.Values.global.imageRegistry }}/{{ end }}{{ $svc.image.repository }}:{{ $svc.image.tag }}"
+          image: "{{ $global.Values.global.imageRegistry }}{{ if $global.Values.global.imageRegistry }}/{{ end }}{{ $svc.image.repository }}:{{ $svc.image.tag }}{{ if $svc.image.digest }}@{{ $svc.image.digest }}{{ end }}"
           imagePullPolicy: {{ default "IfNotPresent" $svc.image.pullPolicy }}
           ports:
             - name: http

@@ -37,7 +37,8 @@ func main() {
 	// Create server
 	srv, err := server.New(&logAdapter{logger})
 	if err != nil {
-		log.Fatalf("failed to create server: %v", err)
+		log.Printf("failed to create server: %v", err)
+		os.Exit(1)
 	}
 
 	// Start server in a goroutine
@@ -49,7 +50,8 @@ func main() {
 	go func() {
 		log.Printf("workspace-service starting on port %s", port)
 		if err := httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatalf("server failed: %v", err)
+			log.Printf("server failed: %v", err)
+			return
 		}
 	}()
 

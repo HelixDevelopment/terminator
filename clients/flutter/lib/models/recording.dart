@@ -12,6 +12,23 @@ class Recording {
     required this.duration,
     required this.createdAt,
   });
+  factory Recording.fromJson(Map<String, dynamic> json) {
+    return Recording(
+      id: json['id'] as String,
+      sessionId: json['session_id'] as String,
+      title: json['title'] as String,
+      duration: Duration(milliseconds: json['duration'] as int),
+      createdAt: DateTime.parse(json['created_at'] as String),
+    );
+  }
 
-  // TODO: add fromJson, toJson
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'session_id': sessionId,
+      'title': title,
+      'duration': duration.inMilliseconds,
+      'created_at': createdAt.toIso8601String(),
+    };
+  }
 }

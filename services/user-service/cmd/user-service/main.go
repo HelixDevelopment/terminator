@@ -28,7 +28,8 @@ func main() {
 	// Ping check below), so a migration failure (including a dirty schema
 	// state) is fatal here too - never serve against an unmigrated schema.
 	if version, err := migrations.Run(databaseURL, log.Default()); err != nil {
-		log.Fatalf("failed to apply database migrations: %v", err)
+		log.Printf("failed to apply database migrations: %v", err)
+		os.Exit(1)
 	} else {
 		log.Printf("database migrations applied - schema version %d", version)
 	}
@@ -40,7 +41,8 @@ func main() {
 	// "public" schema (schema-per-service, GAP-01).
 	poolURL, err := migrations.ConnectionURL(databaseURL)
 	if err != nil {
-		log.Fatalf("failed to build schema-scoped connection URL: %v", err)
+		log.Printf("failed to build schema-scoped connection URL: %v", err)
+		os.Exit(1)
 	}
 
 	// Initialize database connection
@@ -48,13 +50,16 @@ func main() {
 	defer cancel()
 	pool, err := pgxpool.New(ctx, poolURL)
 	if err != nil {
-		log.Fatalf("failed to connect to database: %v", err)
+		log.Printf("failed to connect to database: %v", err)
+		os.Exit(1)
 	}
 	defer pool.Close()
 
 	// Test connection
 	if err := pool.Ping(ctx); err != nil {
-		log.Fatalf("failed to ping database: %v", err)
+		log.Printf("failed to ping database: %v", err)
+		pool.Close()
+		os.Exit(1)
 	}
 	log.Println("database connection established")
 
@@ -63,6 +68,7 @@ func main() {
 
 	log.Printf("user-service starting on port %s", port)
 	if err := srv.Run(":" + port); err != nil {
-		log.Fatalf("server failed: %v", err)
+		log.Printf("server failed: %v", err)
+		return
 	}
 }

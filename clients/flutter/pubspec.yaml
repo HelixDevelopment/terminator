@@ -18,7 +18,7 @@ dependencies:
   xterm: ^4.0.0
   design_system:
     path: design_system
-  # TODO: add additional dependencies (webview, file_picker, charts, etc.)
+  flutter_svg: ^2.0.10
 
 dev_dependencies:
   flutter_test:

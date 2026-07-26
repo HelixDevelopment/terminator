@@ -12,6 +12,23 @@ class Snippet {
     required this.language,
     required this.createdAt,
   });
+  factory Snippet.fromJson(Map<String, dynamic> json) {
+    return Snippet(
+      id: json['id'] as String,
+      title: json['title'] as String,
+      content: json['content'] as String,
+      language: json['language'] as String,
+      createdAt: DateTime.parse(json['created_at'] as String),
+    );
+  }
 
-  // TODO: add fromJson, toJson
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'content': content,
+      'language': language,
+      'created_at': createdAt.toIso8601String(),
+    };
+  }
 }

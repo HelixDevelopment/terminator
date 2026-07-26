@@ -12,6 +12,23 @@ class Notification {
     this.read = false,
     required this.createdAt,
   });
+  factory Notification.fromJson(Map<String, dynamic> json) {
+    return Notification(
+      id: json['id'] as String,
+      title: json['title'] as String,
+      body: json['body'] as String,
+      read: json['read'] as bool,
+      createdAt: DateTime.parse(json['created_at'] as String),
+    );
+  }
 
-  // TODO: add fromJson, toJson
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'body': body,
+      'read': read,
+      'created_at': createdAt.toIso8601String(),
+    };
+  }
 }

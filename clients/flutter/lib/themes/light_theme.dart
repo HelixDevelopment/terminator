@@ -26,5 +26,20 @@ final ThemeData lightTheme = ThemeData(
       borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
     ),
   ),
-  // TODO: add typography, button themes, chip theme
+  textTheme: const TextTheme(
+    headlineLarge: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+    headlineMedium: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
+    bodyLarge: TextStyle(fontSize: 16),
+    bodyMedium: TextStyle(fontSize: 14),
+    labelLarge: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+  ),
+  elevatedButtonTheme: ElevatedButtonThemeData(
+    style: ElevatedButton.styleFrom(
+      minimumSize: const Size(64, 44),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+    ),
+  ),
+  chipTheme: ChipThemeData(
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+  ),
 );

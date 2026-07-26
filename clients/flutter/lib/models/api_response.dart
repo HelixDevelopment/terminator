@@ -9,5 +9,11 @@ class ApiResponse<T> {
     this.error,
   });
 
-  // TODO: add factory constructors for success/error
+  factory ApiResponse.success(T data) {
+    return ApiResponse(success: true, data: data);
+  }
+
+  factory ApiResponse.error(String error) {
+    return ApiResponse(success: false, error: error);
+  }
 }

@@ -96,9 +96,9 @@ module "elasticache" {
   project_name              = var.project_name
   environment               = var.environment
   private_subnet_ids        = module.vpc.private_subnet_ids
-  elasticache_security_group_id = module.vpc.eks_node_security_group_id
+  vpc_id                    = module.vpc.vpc_id
   node_type                 = "cache.t3.medium"
-  num_cache_nodes           = 1
+  num_cache_clusters        = 1
 }
 
 # MSK Module
@@ -108,7 +108,7 @@ module "msk" {
   project_name       = var.project_name
   environment        = var.environment
   private_subnet_ids = module.vpc.private_subnet_ids
-  msk_security_group_id = module.vpc.eks_node_security_group_id
+  vpc_id             = module.vpc.vpc_id
   kafka_version      = "3.9.0"
   broker_instance_type = "kafka.t3.small"
   number_of_broker_nodes = 2
@@ -120,8 +120,7 @@ module "iam" {
 
   project_name = var.project_name
   environment  = var.environment
-  cluster_name = module.eks.cluster_name
-  oidc_provider_arn = module.eks.oidc_provider_arn
+  eks_cluster_name = module.eks.cluster_name
 }
 
 variable "allowed_cidr_blocks" {

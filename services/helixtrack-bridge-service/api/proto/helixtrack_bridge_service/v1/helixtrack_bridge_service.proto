@@ -1,17 +1,829 @@
 syntax = "proto3";
-
 package helixtrack_bridge_service.v1;
-
 option go_package = "github.com/helixdevelopment/helixtrack-bridge-service/api/proto/helixtrack_bridge_service/v1;helixtrack_bridge_servicev1";
 
-// TODO: define service RPCs and messages
-
-service HelixtrackBridgeServiceService {
-	rpc HealthCheck (HealthCheckRequest) returns (HealthCheckResponse);
+import "google/protobuf/timestamp.proto";
+service HelixtrackBridgeService {
+  rpc GetTrack(GetTrackRequest) returns (GetTrackResponse);
+  rpc ListTracks(ListTracksRequest) returns (ListTracksResponse);
+  rpc CreateTrack(CreateTrackRequest) returns (CreateTrackResponse);
+  rpc UpdateTrack(UpdateTrackRequest) returns (UpdateTrackResponse);
+  rpc DeleteTrack(DeleteTrackRequest) returns (DeleteTrackResponse);
+  rpc GetTrackMetrics(GetTrackMetricsRequest) returns (GetTrackMetricsResponse);
+  rpc GetTrackHistory(GetTrackHistoryRequest) returns (GetTrackHistoryResponse);
+  rpc GetTrackStatus(GetTrackStatusRequest) returns (GetTrackStatusResponse);
+  rpc StartTrack(StartTrackRequest) returns (StartTrackResponse);
+  rpc StopTrack(StopTrackRequest) returns (StopTrackResponse);
+  rpc PauseTrack(PauseTrackRequest) returns (PauseTrackResponse);
+  rpc ResumeTrack(ResumeTrackRequest) returns (ResumeTrackResponse);
+  rpc GetTrackEvents(GetTrackEventsRequest) returns (GetTrackEventsResponse);
+  rpc StreamTrackEvents(StreamTrackEventsRequest) returns (stream StreamTrackEventsResponse);
+  rpc GetTrackAlerts(GetTrackAlertsRequest) returns (GetTrackAlertsResponse);
+  rpc CreateTrackAlert(CreateTrackAlertRequest) returns (CreateTrackAlertResponse);
+  rpc UpdateTrackAlert(UpdateTrackAlertRequest) returns (UpdateTrackAlertResponse);
+  rpc DeleteTrackAlert(DeleteTrackAlertRequest) returns (DeleteTrackAlertResponse);
+  rpc GetTrackIntegrations(GetTrackIntegrationsRequest) returns (GetTrackIntegrationsResponse);
+  rpc AddTrackIntegration(AddTrackIntegrationRequest) returns (AddTrackIntegrationResponse);
+  rpc RemoveTrackIntegration(RemoveTrackIntegrationRequest) returns (RemoveTrackIntegrationResponse);
+  rpc GetTrackReports(GetTrackReportsRequest) returns (GetTrackReportsResponse);
+  rpc GenerateTrackReport(GenerateTrackReportRequest) returns (GenerateTrackReportResponse);
+  rpc GetTrackAuditLog(GetTrackAuditLogRequest) returns (GetTrackAuditLogResponse);
+  rpc GetTrackPermissions(GetTrackPermissionsRequest) returns (GetTrackPermissionsResponse);
+  rpc UpdateTrackPermissions(UpdateTrackPermissionsRequest) returns (UpdateTrackPermissionsResponse);
+  rpc ExportTrackData(ExportTrackDataRequest) returns (ExportTrackDataResponse);
+  rpc ImportTrackData(ImportTrackDataRequest) returns (ImportTrackDataResponse);
+  rpc GetTrackTemplates(GetTrackTemplatesRequest) returns (GetTrackTemplatesResponse);
+  rpc ApplyTrackTemplate(ApplyTrackTemplateRequest) returns (ApplyTrackTemplateResponse);
+  rpc GetTrackDependencies(GetTrackDependenciesRequest) returns (GetTrackDependenciesResponse);
+  rpc GetTrackComparison(GetTrackComparisonRequest) returns (GetTrackComparisonResponse);
+  rpc GetTrackBenchmarks(GetTrackBenchmarksRequest) returns (GetTrackBenchmarksResponse);
+  rpc SetTrackBenchmark(SetTrackBenchmarkRequest) returns (SetTrackBenchmarkResponse);
 }
 
-message HealthCheckRequest {}
-
-message HealthCheckResponse {
-	bool healthy = 1;
+message Track {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  string type = 4;
+  string status = 5;
+  string organization_id = 6;
+  string owner_id = 7;
+  google.protobuf.Timestamp created_at = 8;
+  google.protobuf.Timestamp updated_at = 9;
+  google.protobuf.Timestamp started_at = 10;
+  google.protobuf.Timestamp ended_at = 11;
+  map<string, string> metadata = 12;
 }
+
+message TrackMetrics {
+  string track_id = 1;
+  int64 total_events = 2;
+  int64 total_alerts = 3;
+  float average_latency_ms = 4;
+  float throughput_per_second = 5;
+  int64 error_count = 6;
+  float success_rate = 7;
+  google.protobuf.Timestamp collected_at = 8;
+}
+
+message TrackHistory {
+  string track_id = 1;
+  repeated TrackHistoryEntry entries = 2;
+}
+
+message TrackHistoryEntry {
+  string action = 1;
+  string actor_id = 2;
+  google.protobuf.Timestamp timestamp = 3;
+  map<string, string> details = 4;
+}
+
+message TrackStatus {
+  string track_id = 1;
+  string status = 2;
+  string current_phase = 3;
+  float progress_percent = 4;
+  string last_message = 5;
+  google.protobuf.Timestamp updated_at = 6;
+}
+
+message TrackEvent {
+  string id = 1;
+  string track_id = 2;
+  string type = 3;
+  string severity = 4;
+  string message = 5;
+  map<string, string> payload = 6;
+  google.protobuf.Timestamp timestamp = 7;
+}
+
+message TrackEvents {
+  string track_id = 1;
+  repeated TrackEvent events = 2;
+}
+
+message TrackAlert {
+  string id = 1;
+  string track_id = 2;
+  string name = 3;
+  string condition = 4;
+  string severity = 5;
+  repeated string notification_channels = 6;
+  bool enabled = 7;
+  google.protobuf.Timestamp created_at = 8;
+  google.protobuf.Timestamp updated_at = 9;
+}
+
+message TrackAlerts {
+  string track_id = 1;
+  repeated TrackAlert alerts = 2;
+}
+
+message TrackIntegration {
+  string id = 1;
+  string track_id = 2;
+  string type = 3;
+  string name = 4;
+  string config = 5;
+  bool enabled = 6;
+  google.protobuf.Timestamp created_at = 7;
+  google.protobuf.Timestamp updated_at = 8;
+}
+
+message TrackIntegrations {
+  string track_id = 1;
+  repeated TrackIntegration integrations = 2;
+}
+
+message TrackReport {
+  string id = 1;
+  string track_id = 2;
+  string type = 3;
+  google.protobuf.Timestamp start_date = 4;
+  google.protobuf.Timestamp end_date = 5;
+  bytes content = 6;
+  string format = 7;
+  google.protobuf.Timestamp generated_at = 8;
+}
+
+message TrackReports {
+  string track_id = 1;
+  repeated TrackReport reports = 2;
+}
+
+message TrackPermissions {
+  string track_id = 1;
+  repeated TrackPermission permissions = 2;
+}
+
+message TrackPermission {
+  string user_id = 1;
+  string role = 2;
+  repeated string actions = 3;
+}
+
+message TrackTemplate {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  string type = 4;
+  map<string, string> default_config = 5;
+  map<string, string> metadata = 6;
+}
+
+message TrackTemplates {
+  repeated TrackTemplate templates = 1;
+}
+
+message TrackDependencies {
+  string track_id = 1;
+  repeated string upstream_tracks = 2;
+  repeated string downstream_tracks = 3;
+  repeated string services = 4;
+}
+
+message TrackComparison {
+  string track_id = 1;
+  string compare_track_id = 2;
+  map<string, float> metric_differences = 3;
+  float overall_score = 4;
+  string winner = 5;
+}
+
+message TrackBenchmark {
+  string id = 1;
+  string track_id = 2;
+  string metric = 3;
+  float target_value = 4;
+  float current_value = 5;
+  string status = 6;
+  google.protobuf.Timestamp updated_at = 7;
+}
+
+message TrackBenchmarks {
+  string track_id = 1;
+  repeated TrackBenchmark benchmarks = 2;
+}
+
+message AuditLogStream {
+  repeated AuditLogEntry entries = 1;
+}
+
+message AuditLogEntry {
+  string id = 1;
+  string action = 2;
+  string actor_id = 3;
+  string resource_type = 4;
+  string resource_id = 5;
+  google.protobuf.Timestamp timestamp = 6;
+  map<string, string> metadata = 7;
+}
+
+message GetTrackRequest {
+  string id = 1;
+}
+
+message ListTracksRequest {
+  string organization_id = 1;
+  string owner_id = 2;
+  string type = 3;
+  string status = 4;
+  int32 page_size = 5;
+  string page_token = 6;
+  string sort_by = 7;
+}
+
+message ListTracksResponse {
+  repeated Track tracks = 1;
+  string next_page_token = 2;
+  int32 total_count = 3;
+}
+
+message CreateTrackRequest {
+  string name = 1;
+  string description = 2;
+  string type = 3;
+  string organization_id = 4;
+  string owner_id = 5;
+  map<string, string> metadata = 6;
+}
+
+message UpdateTrackRequest {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  string status = 4;
+  map<string, string> metadata = 5;
+}
+
+message DeleteTrackRequest {
+  string id = 1;
+  bool force = 2;
+}
+
+message StartTrackRequest {
+  string id = 1;
+  map<string, string> parameters = 2;
+}
+
+message StopTrackRequest {
+  string id = 1;
+  string reason = 2;
+}
+
+message PauseTrackRequest {
+  string id = 1;
+  string reason = 2;
+}
+
+message ResumeTrackRequest {
+  string id = 1;
+}
+
+message StreamTrackEventsRequest {
+  string track_id = 1;
+  repeated string event_types = 2;
+  string severity = 3;
+}
+
+message CreateTrackAlertRequest {
+  string track_id = 1;
+  string name = 2;
+  string condition = 3;
+  string severity = 4;
+  repeated string notification_channels = 5;
+  bool enabled = 6;
+}
+
+message UpdateTrackAlertRequest {
+  string id = 1;
+  string track_id = 2;
+  string name = 3;
+  string condition = 4;
+  string severity = 5;
+  repeated string notification_channels = 6;
+  bool enabled = 7;
+}
+
+message DeleteTrackAlertRequest {
+  string id = 1;
+  string track_id = 2;
+}
+
+message AddTrackIntegrationRequest {
+  string track_id = 1;
+  string type = 2;
+  string name = 3;
+  string config = 4;
+  bool enabled = 5;
+}
+
+message RemoveTrackIntegrationRequest {
+  string id = 1;
+  string track_id = 2;
+}
+
+message GetTrackReportsRequest {
+  string track_id = 1;
+  string type = 2;
+  int32 page_size = 3;
+  string page_token = 4;
+}
+
+message GenerateTrackReportRequest {
+  string track_id = 1;
+  string type = 2;
+  google.protobuf.Timestamp start_date = 3;
+  google.protobuf.Timestamp end_date = 4;
+  string format = 5;
+}
+
+message UpdateTrackPermissionsRequest {
+  string track_id = 1;
+  repeated TrackPermission permissions = 2;
+  bool replace = 3;
+}
+
+message ExportTrackDataRequest {
+  string id = 1;
+  string format = 2;
+  google.protobuf.Timestamp start_date = 3;
+  google.protobuf.Timestamp end_date = 4;
+}
+
+message ExportTrackDataResponse {
+  bytes data = 1;
+  string format = 2;
+}
+
+message ImportTrackDataRequest {
+  bytes data = 1;
+  string format = 2;
+  string organization_id = 3;
+  string owner_id = 4;
+}
+
+message ApplyTrackTemplateRequest {
+  string template_id = 1;
+  string name = 2;
+  string organization_id = 3;
+  string owner_id = 4;
+  map<string, string> overrides = 5;
+}
+
+message GetTrackComparisonRequest {
+  string track_id = 1;
+  string compare_track_id = 2;
+  repeated string metrics = 3;
+}
+
+message SetTrackBenchmarkRequest {
+  string track_id = 1;
+  string metric = 2;
+  float target_value = 3;
+}
+
+message GetTrackResponse {
+
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  string type = 4;
+  string status = 5;
+  string organization_id = 6;
+  string owner_id = 7;
+  google.protobuf.Timestamp created_at = 8;
+  google.protobuf.Timestamp updated_at = 9;
+  google.protobuf.Timestamp started_at = 10;
+  google.protobuf.Timestamp ended_at = 11;
+  map<string, string> metadata = 12;
+}
+
+message CreateTrackResponse {
+
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  string type = 4;
+  string status = 5;
+  string organization_id = 6;
+  string owner_id = 7;
+  google.protobuf.Timestamp created_at = 8;
+  google.protobuf.Timestamp updated_at = 9;
+  google.protobuf.Timestamp started_at = 10;
+  google.protobuf.Timestamp ended_at = 11;
+  map<string, string> metadata = 12;
+}
+
+message UpdateTrackResponse {
+
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  string type = 4;
+  string status = 5;
+  string organization_id = 6;
+  string owner_id = 7;
+  google.protobuf.Timestamp created_at = 8;
+  google.protobuf.Timestamp updated_at = 9;
+  google.protobuf.Timestamp started_at = 10;
+  google.protobuf.Timestamp ended_at = 11;
+  map<string, string> metadata = 12;
+}
+
+message DeleteTrackResponse {
+
+}
+
+message GetTrackMetricsResponse {
+
+  string track_id = 1;
+  int64 total_events = 2;
+  int64 total_alerts = 3;
+  float average_latency_ms = 4;
+  float throughput_per_second = 5;
+  int64 error_count = 6;
+  float success_rate = 7;
+  google.protobuf.Timestamp collected_at = 8;
+}
+
+message GetTrackHistoryResponse {
+
+  string track_id = 1;
+  repeated TrackHistoryEntry entries = 2;
+}
+
+message GetTrackStatusResponse {
+
+  string track_id = 1;
+  string status = 2;
+  string current_phase = 3;
+  float progress_percent = 4;
+  string last_message = 5;
+  google.protobuf.Timestamp updated_at = 6;
+}
+
+message StartTrackResponse {
+
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  string type = 4;
+  string status = 5;
+  string organization_id = 6;
+  string owner_id = 7;
+  google.protobuf.Timestamp created_at = 8;
+  google.protobuf.Timestamp updated_at = 9;
+  google.protobuf.Timestamp started_at = 10;
+  google.protobuf.Timestamp ended_at = 11;
+  map<string, string> metadata = 12;
+}
+
+message StopTrackResponse {
+
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  string type = 4;
+  string status = 5;
+  string organization_id = 6;
+  string owner_id = 7;
+  google.protobuf.Timestamp created_at = 8;
+  google.protobuf.Timestamp updated_at = 9;
+  google.protobuf.Timestamp started_at = 10;
+  google.protobuf.Timestamp ended_at = 11;
+  map<string, string> metadata = 12;
+}
+
+message PauseTrackResponse {
+
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  string type = 4;
+  string status = 5;
+  string organization_id = 6;
+  string owner_id = 7;
+  google.protobuf.Timestamp created_at = 8;
+  google.protobuf.Timestamp updated_at = 9;
+  google.protobuf.Timestamp started_at = 10;
+  google.protobuf.Timestamp ended_at = 11;
+  map<string, string> metadata = 12;
+}
+
+message ResumeTrackResponse {
+
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  string type = 4;
+  string status = 5;
+  string organization_id = 6;
+  string owner_id = 7;
+  google.protobuf.Timestamp created_at = 8;
+  google.protobuf.Timestamp updated_at = 9;
+  google.protobuf.Timestamp started_at = 10;
+  google.protobuf.Timestamp ended_at = 11;
+  map<string, string> metadata = 12;
+}
+
+message GetTrackEventsResponse {
+
+  string track_id = 1;
+  repeated TrackEvent events = 2;
+}
+
+message GetTrackAlertsResponse {
+
+  string track_id = 1;
+  repeated TrackAlert alerts = 2;
+}
+
+message CreateTrackAlertResponse {
+
+  string id = 1;
+  string track_id = 2;
+  string name = 3;
+  string condition = 4;
+  string severity = 5;
+  repeated string notification_channels = 6;
+  bool enabled = 7;
+  google.protobuf.Timestamp created_at = 8;
+  google.protobuf.Timestamp updated_at = 9;
+}
+
+message UpdateTrackAlertResponse {
+
+  string id = 1;
+  string track_id = 2;
+  string name = 3;
+  string condition = 4;
+  string severity = 5;
+  repeated string notification_channels = 6;
+  bool enabled = 7;
+  google.protobuf.Timestamp created_at = 8;
+  google.protobuf.Timestamp updated_at = 9;
+}
+
+message DeleteTrackAlertResponse {
+
+}
+
+message GetTrackIntegrationsResponse {
+
+  string track_id = 1;
+  repeated TrackIntegration integrations = 2;
+}
+
+message AddTrackIntegrationResponse {
+
+  string id = 1;
+  string track_id = 2;
+  string type = 3;
+  string name = 4;
+  string config = 5;
+  bool enabled = 6;
+  google.protobuf.Timestamp created_at = 7;
+  google.protobuf.Timestamp updated_at = 8;
+}
+
+message RemoveTrackIntegrationResponse {
+
+}
+
+message GetTrackReportsResponse {
+
+  string track_id = 1;
+  repeated TrackReport reports = 2;
+}
+
+message GenerateTrackReportResponse {
+
+  string id = 1;
+  string track_id = 2;
+  string type = 3;
+  google.protobuf.Timestamp start_date = 4;
+  google.protobuf.Timestamp end_date = 5;
+  bytes content = 6;
+  string format = 7;
+  google.protobuf.Timestamp generated_at = 8;
+}
+
+message GetTrackAuditLogResponse {
+
+  repeated AuditLogEntry entries = 1;
+}
+
+message GetTrackPermissionsResponse {
+
+  string track_id = 1;
+  repeated TrackPermission permissions = 2;
+}
+
+message UpdateTrackPermissionsResponse {
+
+  string track_id = 1;
+  repeated TrackPermission permissions = 2;
+}
+
+message ImportTrackDataResponse {
+
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  string type = 4;
+  string status = 5;
+  string organization_id = 6;
+  string owner_id = 7;
+  google.protobuf.Timestamp created_at = 8;
+  google.protobuf.Timestamp updated_at = 9;
+  google.protobuf.Timestamp started_at = 10;
+  google.protobuf.Timestamp ended_at = 11;
+  map<string, string> metadata = 12;
+}
+
+message GetTrackTemplatesRequest {
+
+}
+
+message GetTrackTemplatesResponse {
+
+  repeated TrackTemplate templates = 1;
+}
+
+message ApplyTrackTemplateResponse {
+
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  string type = 4;
+  string status = 5;
+  string organization_id = 6;
+  string owner_id = 7;
+  google.protobuf.Timestamp created_at = 8;
+  google.protobuf.Timestamp updated_at = 9;
+  google.protobuf.Timestamp started_at = 10;
+  google.protobuf.Timestamp ended_at = 11;
+  map<string, string> metadata = 12;
+}
+
+message GetTrackDependenciesResponse {
+
+  string track_id = 1;
+  repeated string upstream_tracks = 2;
+  repeated string downstream_tracks = 3;
+  repeated string services = 4;
+}
+
+message GetTrackComparisonResponse {
+
+  string track_id = 1;
+  string compare_track_id = 2;
+  map<string, float> metric_differences = 3;
+  float overall_score = 4;
+  string winner = 5;
+}
+
+message GetTrackBenchmarksResponse {
+
+  string track_id = 1;
+  repeated TrackBenchmark benchmarks = 2;
+}
+
+message SetTrackBenchmarkResponse {
+
+  string id = 1;
+  string track_id = 2;
+  string metric = 3;
+  float target_value = 4;
+  float current_value = 5;
+  string status = 6;
+  google.protobuf.Timestamp updated_at = 7;
+}
+message GetTrackMetricsRequest {
+
+  string organization_id = 1;
+  string owner_id = 2;
+  string type = 3;
+  string status = 4;
+  int32 page_size = 5;
+  string page_token = 6;
+  string sort_by = 7;
+
+}
+
+message GetTrackHistoryRequest {
+
+  string organization_id = 1;
+  string owner_id = 2;
+  string type = 3;
+  string status = 4;
+  int32 page_size = 5;
+  string page_token = 6;
+  string sort_by = 7;
+
+}
+
+message GetTrackStatusRequest {
+
+  string organization_id = 1;
+  string owner_id = 2;
+  string type = 3;
+  string status = 4;
+  int32 page_size = 5;
+  string page_token = 6;
+  string sort_by = 7;
+
+}
+
+message GetTrackEventsRequest {
+
+  string organization_id = 1;
+  string owner_id = 2;
+  string type = 3;
+  string status = 4;
+  int32 page_size = 5;
+  string page_token = 6;
+  string sort_by = 7;
+
+}
+
+message StreamTrackEventsResponse {
+
+  string track_id = 1;
+  repeated TrackEvent events = 2;
+
+}
+
+message GetTrackAlertsRequest {
+
+  string organization_id = 1;
+  string owner_id = 2;
+  string type = 3;
+  string status = 4;
+  int32 page_size = 5;
+  string page_token = 6;
+  string sort_by = 7;
+
+}
+
+message GetTrackIntegrationsRequest {
+
+  string organization_id = 1;
+  string owner_id = 2;
+  string type = 3;
+  string status = 4;
+  int32 page_size = 5;
+  string page_token = 6;
+  string sort_by = 7;
+
+}
+
+message GetTrackAuditLogRequest {
+
+  string organization_id = 1;
+  string owner_id = 2;
+  string type = 3;
+  string status = 4;
+  int32 page_size = 5;
+  string page_token = 6;
+  string sort_by = 7;
+
+}
+
+message GetTrackPermissionsRequest {
+
+  string organization_id = 1;
+  string owner_id = 2;
+  string type = 3;
+  string status = 4;
+  int32 page_size = 5;
+  string page_token = 6;
+  string sort_by = 7;
+
+}
+
+message GetTrackDependenciesRequest {
+
+  string organization_id = 1;
+  string owner_id = 2;
+  string type = 3;
+  string status = 4;
+  int32 page_size = 5;
+  string page_token = 6;
+  string sort_by = 7;
+
+}
+
+message GetTrackBenchmarksRequest {
+
+  string organization_id = 1;
+  string owner_id = 2;
+  string type = 3;
+  string status = 4;
+  int32 page_size = 5;
+  string page_token = 6;
+  string sort_by = 7;
+
+}
+

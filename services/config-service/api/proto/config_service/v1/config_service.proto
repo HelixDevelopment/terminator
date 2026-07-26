@@ -1,17 +1,658 @@
 syntax = "proto3";
-
 package config_service.v1;
-
 option go_package = "github.com/helixdevelopment/config-service/api/proto/config_service/v1;config_servicev1";
 
-// TODO: define service RPCs and messages
-
-service ConfigServiceService {
-	rpc HealthCheck (HealthCheckRequest) returns (HealthCheckResponse);
+import "google/protobuf/timestamp.proto";
+service ConfigService {
+  rpc GetConfig(GetConfigRequest) returns (GetConfigResponse);
+  rpc ListConfigs(ListConfigsRequest) returns (ListConfigsResponse);
+  rpc SetConfig(SetConfigRequest) returns (SetConfigResponse);
+  rpc DeleteConfig(DeleteConfigRequest) returns (DeleteConfigResponse);
+  rpc GetServiceConfig(GetServiceConfigRequest) returns (GetServiceConfigResponse);
+  rpc UpdateServiceConfig(UpdateServiceConfigRequest) returns (UpdateServiceConfigResponse);
+  rpc GetFeatureFlags(GetFeatureFlagsRequest) returns (GetFeatureFlagsResponse);
+  rpc UpdateFeatureFlags(UpdateFeatureFlagsRequest) returns (UpdateFeatureFlagsResponse);
+  rpc GetEnvironmentConfig(GetEnvironmentConfigRequest) returns (GetEnvironmentConfigResponse);
+  rpc UpdateEnvironmentConfig(UpdateEnvironmentConfigRequest) returns (UpdateEnvironmentConfigResponse);
+  rpc GetGlobalDefaults(GetGlobalDefaultsRequest) returns (GetGlobalDefaultsResponse);
+  rpc UpdateGlobalDefaults(UpdateGlobalDefaultsRequest) returns (UpdateGlobalDefaultsResponse);
+  rpc GetOrganizationConfig(GetOrganizationConfigRequest) returns (GetOrganizationConfigResponse);
+  rpc UpdateOrganizationConfig(UpdateOrganizationConfigRequest) returns (UpdateOrganizationConfigResponse);
+  rpc GetUserConfig(GetUserConfigRequest) returns (GetUserConfigResponse);
+  rpc UpdateUserConfig(UpdateUserConfigRequest) returns (UpdateUserConfigResponse);
+  rpc ValidateConfig(ValidateConfigRequest) returns (ValidateConfigResponse);
+  rpc GetConfigHistory(GetConfigHistoryRequest) returns (GetConfigHistoryResponse);
+  rpc RollbackConfig(RollbackConfigRequest) returns (RollbackConfigResponse);
+  rpc GetConfigDiff(GetConfigDiffRequest) returns (GetConfigDiffResponse);
+  rpc ExportConfig(ExportConfigRequest) returns (ExportConfigResponse);
+  rpc ImportConfig(ImportConfigRequest) returns (ImportConfigResponse);
+  rpc GetConfigSchema(GetConfigSchemaRequest) returns (GetConfigSchemaResponse);
+  rpc WatchConfig(WatchConfigRequest) returns (stream WatchConfigResponse);
+  rpc GetConfigHealth(GetConfigHealthRequest) returns (GetConfigHealthResponse);
+  rpc RefreshConfig(RefreshConfigRequest) returns (RefreshConfigResponse);
+  rpc GetConfigDependencies(GetConfigDependenciesRequest) returns (GetConfigDependenciesResponse);
+  rpc GetConfigAuditLog(GetConfigAuditLogRequest) returns (GetConfigAuditLogResponse);
+  rpc CloneConfig(CloneConfigRequest) returns (CloneConfigResponse);
+  rpc BulkSetConfig(BulkSetConfigRequest) returns (BulkSetConfigResponse);
+  rpc GetConfigTemplates(GetConfigTemplatesRequest) returns (GetConfigTemplatesResponse);
+  rpc ApplyConfigTemplate(ApplyConfigTemplateRequest) returns (ApplyConfigTemplateResponse);
 }
 
-message HealthCheckRequest {}
-
-message HealthCheckResponse {
-	bool healthy = 1;
+message ConfigValue {
+  string key = 1;
+  string value = 2;
+  string type = 3;
+  string description = 4;
+  string scope = 5;
+  string organization_id = 6;
+  string user_id = 7;
+  string service = 8;
+  google.protobuf.Timestamp created_at = 9;
+  google.protobuf.Timestamp updated_at = 10;
+  string updated_by = 11;
+  bool is_secret = 12;
+  map<string, string> metadata = 13;
 }
+
+message ServiceConfig {
+  string service = 1;
+  repeated ConfigValue configs = 2;
+  google.protobuf.Timestamp updated_at = 3;
+}
+
+message FeatureFlags {
+  string scope = 1;
+  string organization_id = 2;
+  map<string, bool> flags = 3;
+  google.protobuf.Timestamp updated_at = 4;
+}
+
+message EnvironmentConfig {
+  string environment = 1;
+  repeated ConfigValue configs = 2;
+  map<string, string> variables = 3;
+  google.protobuf.Timestamp updated_at = 4;
+}
+
+message GlobalDefaults {
+  repeated ConfigValue configs = 1;
+  map<string, string> variables = 2;
+  google.protobuf.Timestamp updated_at = 3;
+}
+
+message OrganizationConfig {
+  string organization_id = 1;
+  repeated ConfigValue configs = 2;
+  FeatureFlags feature_flags = 3;
+  google.protobuf.Timestamp updated_at = 4;
+}
+
+message UserConfig {
+  string user_id = 1;
+  repeated ConfigValue configs = 2;
+  google.protobuf.Timestamp updated_at = 3;
+}
+
+message ValidationResult {
+  bool valid = 1;
+  repeated string errors = 2;
+  repeated string warnings = 3;
+}
+
+message ConfigHistory {
+  string key = 1;
+  string scope = 2;
+  repeated ConfigHistoryEntry entries = 3;
+}
+
+message ConfigHistoryEntry {
+  string id = 1;
+  string value = 2;
+  string updated_by = 3;
+  google.protobuf.Timestamp timestamp = 4;
+  string change_reason = 5;
+}
+
+message ConfigDiff {
+  string key = 1;
+  string old_value = 2;
+  string new_value = 3;
+  string diff = 4;
+}
+
+message ConfigSchema {
+  string key = 1;
+  string type = 2;
+  string description = 3;
+  bool required = 4;
+  string default_value = 5;
+  repeated string allowed_values = 6;
+  string validation_regex = 7;
+  int32 min_length = 8;
+  int32 max_length = 9;
+}
+
+message ConfigChangeEvent {
+  string key = 1;
+  string old_value = 2;
+  string new_value = 3;
+  string scope = 4;
+  string updated_by = 5;
+  google.protobuf.Timestamp timestamp = 6;
+}
+
+message ConfigHealth {
+  string status = 1;
+  int32 total_configs = 2;
+  int32 valid_configs = 3;
+  int32 invalid_configs = 4;
+  repeated string errors = 5;
+  google.protobuf.Timestamp checked_at = 6;
+}
+
+message ConfigDependencies {
+  string key = 1;
+  repeated string depends_on = 2;
+  repeated string depended_by = 3;
+}
+
+message ConfigTemplates {
+  repeated ConfigTemplate templates = 1;
+}
+
+message ConfigTemplate {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  repeated ConfigValue configs = 4;
+  map<string, string> variables = 5;
+  string scope = 6;
+}
+
+message AuditLogStream {
+  repeated AuditLogEntry entries = 1;
+}
+
+message AuditLogEntry {
+  string id = 1;
+  string action = 2;
+  string actor_id = 3;
+  string resource_type = 4;
+  string resource_id = 5;
+  google.protobuf.Timestamp timestamp = 6;
+  map<string, string> metadata = 7;
+}
+
+message GetConfigRequest {
+  string key = 1;
+  string scope = 2;
+  string organization_id = 3;
+  string user_id = 4;
+}
+
+message ListConfigsRequest {
+  string scope = 1;
+  string organization_id = 2;
+  string user_id = 3;
+  string service = 4;
+  string prefix = 5;
+  int32 page_size = 6;
+  string page_token = 7;
+}
+
+message ListConfigsResponse {
+  repeated ConfigValue configs = 1;
+  string next_page_token = 2;
+  int32 total_count = 3;
+}
+
+message SetConfigRequest {
+  string key = 1;
+  string value = 2;
+  string type = 3;
+  string description = 4;
+  string scope = 5;
+  string organization_id = 6;
+  string user_id = 7;
+  string service = 8;
+  bool is_secret = 9;
+  string change_reason = 10;
+  map<string, string> metadata = 11;
+}
+
+message DeleteConfigRequest {
+  string key = 1;
+  string scope = 2;
+  string organization_id = 3;
+  string user_id = 4;
+}
+
+message GetServiceConfigRequest {
+  string service = 1;
+  string environment = 2;
+}
+
+message UpdateServiceConfigRequest {
+  string service = 1;
+  string environment = 2;
+  repeated ConfigValue configs = 3;
+}
+
+message GetFeatureFlagsRequest {
+  string scope = 1;
+  string organization_id = 2;
+}
+
+message UpdateFeatureFlagsRequest {
+  string scope = 1;
+  string organization_id = 2;
+  map<string, bool> flags = 3;
+}
+
+message GetEnvironmentConfigRequest {
+  string environment = 1;
+}
+
+message UpdateEnvironmentConfigRequest {
+  string environment = 1;
+  repeated ConfigValue configs = 2;
+  map<string, string> variables = 3;
+}
+
+message UpdateGlobalDefaultsRequest {
+  repeated ConfigValue configs = 1;
+  map<string, string> variables = 2;
+}
+
+message GetOrganizationConfigRequest {
+  string organization_id = 1;
+}
+
+message UpdateOrganizationConfigRequest {
+  string organization_id = 1;
+  repeated ConfigValue configs = 2;
+  FeatureFlags feature_flags = 3;
+}
+
+message GetUserConfigRequest {
+  string user_id = 1;
+}
+
+message UpdateUserConfigRequest {
+  string user_id = 1;
+  repeated ConfigValue configs = 2;
+}
+
+message ValidateConfigRequest {
+  string key = 1;
+  string value = 2;
+  string type = 3;
+}
+
+message GetConfigHistoryRequest {
+  string key = 1;
+  string scope = 2;
+  string organization_id = 3;
+  int32 page_size = 4;
+  string page_token = 5;
+}
+
+message RollbackConfigRequest {
+  string key = 1;
+  string scope = 2;
+  string entry_id = 3;
+  string organization_id = 4;
+}
+
+message GetConfigDiffRequest {
+  string key = 1;
+  string scope = 2;
+  string from_version = 3;
+  string to_version = 4;
+  string organization_id = 5;
+}
+
+message ExportConfigRequest {
+  string scope = 1;
+  string organization_id = 2;
+  string format = 3;
+  string prefix = 4;
+}
+
+message ExportConfigResponse {
+  bytes data = 1;
+  string format = 2;
+}
+
+message ImportConfigRequest {
+  bytes data = 1;
+  string format = 2;
+  string scope = 3;
+  string organization_id = 4;
+  bool overwrite = 5;
+}
+
+message ImportConfigResponse {
+  int32 imported = 1;
+  int32 skipped = 2;
+  int32 failed = 3;
+}
+
+message GetConfigSchemaRequest {
+  string key = 1;
+}
+
+message WatchConfigRequest {
+  string key = 1;
+  string scope = 2;
+  string organization_id = 3;
+}
+
+message RefreshConfigRequest {
+  string scope = 1;
+  string organization_id = 2;
+  string service = 3;
+}
+
+message GetConfigDependenciesRequest {
+  string key = 1;
+  string scope = 2;
+}
+
+message GetConfigAuditLogRequest {
+  string key = 1;
+  string scope = 2;
+  string organization_id = 3;
+  int32 page_size = 4;
+  string page_token = 5;
+}
+
+message CloneConfigRequest {
+  string source_key = 1;
+  string target_key = 2;
+  string source_scope = 3;
+  string target_scope = 4;
+  string organization_id = 5;
+}
+
+message BulkSetConfigRequest {
+  repeated ConfigValue configs = 1;
+  string scope = 2;
+  string organization_id = 3;
+  bool validate = 4;
+}
+
+message BulkSetConfigResponse {
+  int32 set = 1;
+  int32 failed = 2;
+  repeated string errors = 3;
+}
+
+message ApplyConfigTemplateRequest {
+  string template_id = 1;
+  string scope = 2;
+  string organization_id = 3;
+  map<string, string> variables = 4;
+  bool overwrite = 5;
+}
+
+message GetConfigResponse {
+
+  string key = 1;
+  string value = 2;
+  string type = 3;
+  string description = 4;
+  string scope = 5;
+  string organization_id = 6;
+  string user_id = 7;
+  string service = 8;
+  google.protobuf.Timestamp created_at = 9;
+  google.protobuf.Timestamp updated_at = 10;
+  string updated_by = 11;
+  bool is_secret = 12;
+  map<string, string> metadata = 13;
+}
+
+message SetConfigResponse {
+
+  string key = 1;
+  string value = 2;
+  string type = 3;
+  string description = 4;
+  string scope = 5;
+  string organization_id = 6;
+  string user_id = 7;
+  string service = 8;
+  google.protobuf.Timestamp created_at = 9;
+  google.protobuf.Timestamp updated_at = 10;
+  string updated_by = 11;
+  bool is_secret = 12;
+  map<string, string> metadata = 13;
+}
+
+message DeleteConfigResponse {
+
+}
+
+message GetServiceConfigResponse {
+
+  string service = 1;
+  repeated ConfigValue configs = 2;
+  google.protobuf.Timestamp updated_at = 3;
+}
+
+message UpdateServiceConfigResponse {
+
+  string service = 1;
+  repeated ConfigValue configs = 2;
+  google.protobuf.Timestamp updated_at = 3;
+}
+
+message GetFeatureFlagsResponse {
+
+  string scope = 1;
+  string organization_id = 2;
+  map<string, bool> flags = 3;
+  google.protobuf.Timestamp updated_at = 4;
+}
+
+message UpdateFeatureFlagsResponse {
+
+  string scope = 1;
+  string organization_id = 2;
+  map<string, bool> flags = 3;
+  google.protobuf.Timestamp updated_at = 4;
+}
+
+message GetEnvironmentConfigResponse {
+
+  string environment = 1;
+  repeated ConfigValue configs = 2;
+  map<string, string> variables = 3;
+  google.protobuf.Timestamp updated_at = 4;
+}
+
+message UpdateEnvironmentConfigResponse {
+
+  string environment = 1;
+  repeated ConfigValue configs = 2;
+  map<string, string> variables = 3;
+  google.protobuf.Timestamp updated_at = 4;
+}
+
+message GetGlobalDefaultsRequest {
+
+}
+
+message GetGlobalDefaultsResponse {
+
+  repeated ConfigValue configs = 1;
+  map<string, string> variables = 2;
+  google.protobuf.Timestamp updated_at = 3;
+}
+
+message UpdateGlobalDefaultsResponse {
+
+  repeated ConfigValue configs = 1;
+  map<string, string> variables = 2;
+  google.protobuf.Timestamp updated_at = 3;
+}
+
+message GetOrganizationConfigResponse {
+
+  string organization_id = 1;
+  repeated ConfigValue configs = 2;
+  FeatureFlags feature_flags = 3;
+  google.protobuf.Timestamp updated_at = 4;
+}
+
+message UpdateOrganizationConfigResponse {
+
+  string organization_id = 1;
+  repeated ConfigValue configs = 2;
+  FeatureFlags feature_flags = 3;
+  google.protobuf.Timestamp updated_at = 4;
+}
+
+message GetUserConfigResponse {
+
+  string user_id = 1;
+  repeated ConfigValue configs = 2;
+  google.protobuf.Timestamp updated_at = 3;
+}
+
+message UpdateUserConfigResponse {
+
+  string user_id = 1;
+  repeated ConfigValue configs = 2;
+  google.protobuf.Timestamp updated_at = 3;
+}
+
+message ValidateConfigResponse {
+
+  bool valid = 1;
+  repeated string errors = 2;
+  repeated string warnings = 3;
+}
+
+message GetConfigHistoryResponse {
+
+  string key = 1;
+  string scope = 2;
+  repeated ConfigHistoryEntry entries = 3;
+}
+
+message RollbackConfigResponse {
+
+  string key = 1;
+  string value = 2;
+  string type = 3;
+  string description = 4;
+  string scope = 5;
+  string organization_id = 6;
+  string user_id = 7;
+  string service = 8;
+  google.protobuf.Timestamp created_at = 9;
+  google.protobuf.Timestamp updated_at = 10;
+  string updated_by = 11;
+  bool is_secret = 12;
+  map<string, string> metadata = 13;
+}
+
+message GetConfigDiffResponse {
+
+  string key = 1;
+  string old_value = 2;
+  string new_value = 3;
+  string diff = 4;
+}
+
+message GetConfigSchemaResponse {
+
+  string key = 1;
+  string type = 2;
+  string description = 3;
+  bool required = 4;
+  string default_value = 5;
+  repeated string allowed_values = 6;
+  string validation_regex = 7;
+  int32 min_length = 8;
+  int32 max_length = 9;
+}
+
+message GetConfigHealthRequest {
+
+}
+
+message GetConfigHealthResponse {
+
+  string status = 1;
+  int32 total_configs = 2;
+  int32 valid_configs = 3;
+  int32 invalid_configs = 4;
+  repeated string errors = 5;
+  google.protobuf.Timestamp checked_at = 6;
+}
+
+message RefreshConfigResponse {
+
+}
+
+message GetConfigDependenciesResponse {
+
+  string key = 1;
+  repeated string depends_on = 2;
+  repeated string depended_by = 3;
+}
+
+message GetConfigAuditLogResponse {
+
+  repeated AuditLogEntry entries = 1;
+}
+
+message CloneConfigResponse {
+
+  string key = 1;
+  string value = 2;
+  string type = 3;
+  string description = 4;
+  string scope = 5;
+  string organization_id = 6;
+  string user_id = 7;
+  string service = 8;
+  google.protobuf.Timestamp created_at = 9;
+  google.protobuf.Timestamp updated_at = 10;
+  string updated_by = 11;
+  bool is_secret = 12;
+  map<string, string> metadata = 13;
+}
+
+message GetConfigTemplatesRequest {
+
+}
+
+message GetConfigTemplatesResponse {
+
+  repeated ConfigTemplate templates = 1;
+}
+message WatchConfigResponse {
+
+  string status = 1;
+  int32 total_configs = 2;
+  int32 valid_configs = 3;
+  int32 invalid_configs = 4;
+  repeated string errors = 5;
+  google.protobuf.Timestamp checked_at = 6;
+
+}
+
+message ApplyConfigTemplateResponse {
+
+  string template_id = 1;
+  string scope = 2;
+  string organization_id = 3;
+  map<string, string> variables = 4;
+  bool overwrite = 5;
+
+}
+

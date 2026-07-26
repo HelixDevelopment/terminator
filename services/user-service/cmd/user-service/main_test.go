@@ -3,7 +3,7 @@ package main
 import "testing"
 
 // TestMainStub is an honest §11.4.3 SKIP: main() connects to a real
-// PostgreSQL database (log.Fatalf on failure), applies migrations, then
+// PostgreSQL database (graceful log+os.Exit on failure), applies migrations, then
 // delegates to server.Run which opens a real HTTP listener and blocks on
 // os/signal.Notify until SIGINT/SIGTERM. It cannot be exercised as an
 // in-process unit test without either leaking a background listener or

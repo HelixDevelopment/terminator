@@ -16,11 +16,11 @@ This creates:
 ### CI/CD Pipeline
 ```bash
 # Sign image after build
-cosign sign --key env://COSIGN_PRIVATE_KEY \
+cosign sign --key env://COSIGN_PRIVATE_KEY \\
   $REGISTRY/helixterminator/$SERVICE:$TAG
 
 # Verify signature before deployment
-cosign verify --key cosign.pub \
+cosign verify --key cosign.pub \\
   $REGISTRY/helixterminator/$SERVICE:$TAG
 ```
 
@@ -29,7 +29,7 @@ cosign verify --key cosign.pub \
 - name: Sign image
   uses: sigstore/cosign-installer@v3
 - run: |
-    cosign sign --key env://COSIGN_PRIVATE_KEY \
+    cosign sign --key env://COSIGN_PRIVATE_KEY \\
       --yes ${{ env.REGISTRY }}/${{ github.repository }}/${{ matrix.service }}:${{ github.sha }}
   env:
     COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
@@ -63,3 +63,12 @@ spec:
                       MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE...
                       -----END PUBLIC KEY-----
 ```
+
+## Verification Checklist
+
+- [x] Generate key pair per environment.
+- [x] Store private key in a KMS (AWS Secrets Manager / GCP Secret Manager / Azure Key Vault).
+- [x] Commit `cosign.pub` to the repository under `infrastructure/security/cosign/`.
+- [x] Sign images in CI immediately after build.
+- [x] Verify signatures in the deployment pipeline before `kubectl apply`.
+- [x] Enforce verification with Kyverno or OPA Gatekeeper.

@@ -12,6 +12,23 @@ class AuditLog {
     required this.target,
     required this.timestamp,
   });
+  factory AuditLog.fromJson(Map<String, dynamic> json) {
+    return AuditLog(
+      id: json['id'] as String,
+      actor: json['actor'] as String,
+      action: json['action'] as String,
+      target: json['target'] as String,
+      timestamp: DateTime.parse(json['timestamp'] as String),
+    );
+  }
 
-  // TODO: add fromJson, toJson
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'actor': actor,
+      'action': action,
+      'target': target,
+      'timestamp': timestamp.toIso8601String(),
+    };
+  }
 }

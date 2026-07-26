@@ -70,6 +70,10 @@ clients/flutter/.pub-cache/
 # Agent worktree scratchpad — evidence + temp files, never versioned. §11.4.11 / §11.4.30
 scratchpad/
 
+# Terraform generated artifacts — never versioned
+.terraform/
+.terraform.lock.hcl
+
 # §11.4.93/§11.4.95 workable-items SQLite SSoT: docs/workable_items.db itself
 # is TRACKED (authoritative source data, NOT a build artifact — §11.4.95,
 # NEVER add it here). Only its transient WAL/SHM sidecars are ignored; a

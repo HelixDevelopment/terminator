@@ -88,7 +88,8 @@ gateway:
   image:
     repository: helixterminator/gateway-service
     tag: "1.0.0"
-    pullPolicy: IfNotPresent
+    pullPolicy: Always
+    digest: ""
   service:
     type: ClusterIP
     port: 8080
@@ -173,7 +174,8 @@ auth:
   image:
     repository: helixterminator/auth-service
     tag: "1.0.0"
-    pullPolicy: IfNotPresent
+    pullPolicy: Always
+    digest: ""
   service:
     type: ClusterIP
     port: 8080
@@ -249,6 +251,7 @@ user:
   image:
     repository: helixterminator/user-service
     tag: "1.0.0"
+    digest: ""
   service:
     type: ClusterIP
     port: 8080
@@ -316,6 +319,7 @@ vault:
   image:
     repository: helixterminator/vault-service
     tag: "1.0.0"
+    digest: ""
   service:
     type: ClusterIP
     port: 8080
@@ -382,6 +386,7 @@ host:
   image:
     repository: helixterminator/host-service
     tag: "1.0.0"
+    digest: ""
   service:
     type: ClusterIP
     port: 8080
@@ -448,6 +453,7 @@ sshproxy:
   image:
     repository: helixterminator/ssh-proxy-service
     tag: "1.0.0"
+    digest: ""
   service:
     type: ClusterIP
     port: 8080
@@ -514,6 +520,7 @@ terminal:
   image:
     repository: helixterminator/terminal-service
     tag: "1.0.0"
+    digest: ""
   service:
     type: ClusterIP
     port: 8080
@@ -580,6 +587,7 @@ keychain:
   image:
     repository: helixterminator/keychain-service
     tag: "1.0.0"
+    digest: ""
   service:
     type: ClusterIP
     port: 8080
@@ -646,6 +654,7 @@ workspace:
   image:
     repository: helixterminator/workspace-service
     tag: "1.0.0"
+    digest: ""
   service:
     type: ClusterIP
     port: 8080
@@ -712,6 +721,7 @@ config:
   image:
     repository: helixterminator/config-service
     tag: "1.0.0"
+    digest: ""
   service:
     type: ClusterIP
     port: 8080
@@ -778,6 +788,7 @@ pki:
   image:
     repository: helixterminator/pki-service
     tag: "1.0.0"
+    digest: ""
   service:
     type: ClusterIP
     port: 8080
@@ -844,6 +855,7 @@ billing:
   image:
     repository: helixterminator/billing-service
     tag: "1.0.0"
+    digest: ""
   service:
     type: ClusterIP
     port: 8080
@@ -910,6 +922,7 @@ org:
   image:
     repository: helixterminator/org-service
     tag: "1.0.0"
+    digest: ""
   service:
     type: ClusterIP
     port: 8080
@@ -976,6 +989,7 @@ notification:
   image:
     repository: helixterminator/notification-service
     tag: "1.0.0"
+    digest: ""
   service:
     type: ClusterIP
     port: 8080
@@ -1042,6 +1056,7 @@ audit:
   image:
     repository: helixterminator/audit-service
     tag: "1.0.0"
+    digest: ""
   service:
     type: ClusterIP
     port: 8080
@@ -1108,6 +1123,7 @@ health:
   image:
     repository: helixterminator/health-service
     tag: "1.0.0"
+    digest: ""
   service:
     type: ClusterIP
     port: 8080
@@ -1174,6 +1190,7 @@ ai:
   image:
     repository: helixterminator/ai-service
     tag: "1.0.0"
+    digest: ""
   service:
     type: ClusterIP
     port: 8080
@@ -1240,6 +1257,7 @@ collaboration:
   image:
     repository: helixterminator/collaboration-service
     tag: "1.0.0"
+    digest: ""
   service:
     type: ClusterIP
     port: 8080
@@ -1306,6 +1324,7 @@ containerbridge:
   image:
     repository: helixterminator/container-bridge-service
     tag: "1.0.0"
+    digest: ""
   service:
     type: ClusterIP
     port: 8080
@@ -1372,6 +1391,7 @@ helixtrackbridge:
   image:
     repository: helixterminator/helixtrack-bridge-service
     tag: "1.0.0"
+    digest: ""
   service:
     type: ClusterIP
     port: 8080
@@ -1438,6 +1458,7 @@ portforward:
   image:
     repository: helixterminator/port-forward-service
     tag: "1.0.0"
+    digest: ""
   service:
     type: ClusterIP
     port: 8080
@@ -1504,6 +1525,7 @@ sftp:
   image:
     repository: helixterminator/sftp-service
     tag: "1.0.0"
+    digest: ""
   service:
     type: ClusterIP
     port: 8080
@@ -1570,6 +1592,7 @@ recording:
   image:
     repository: helixterminator/recording-service
     tag: "1.0.0"
+    digest: ""
   service:
     type: ClusterIP
     port: 8080
@@ -1636,6 +1659,7 @@ snippet:
   image:
     repository: helixterminator/snippet-service
     tag: "1.0.0"
+    digest: ""
   service:
     type: ClusterIP
     port: 8080
@@ -1702,6 +1726,7 @@ analytics:
   image:
     repository: helixterminator/analytics-service
     tag: "1.0.0"
+    digest: ""
   service:
     type: ClusterIP
     port: 8080

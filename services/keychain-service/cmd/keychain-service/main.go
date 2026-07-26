@@ -28,7 +28,8 @@ func main() {
 	// silent plaintext fallback.
 	encKey := os.Getenv("KEYCHAIN_ENCRYPTION_KEY")
 	if encKey == "" {
-		log.Fatalf("KEYCHAIN_ENCRYPTION_KEY environment variable is required")
+		log.Printf("KEYCHAIN_ENCRYPTION_KEY environment variable is required")
+		os.Exit(1)
 	}
 
 	// Apply pending schema migrations before opening the steady-state pool.
@@ -40,7 +41,8 @@ func main() {
 	// internal/repository + internal/crypto (T10 encryption-at-rest).
 	version, merr := migrations.Run(databaseURL, log.Default())
 	if merr != nil {
-		log.Fatalf("failed to apply database migrations: %v", merr)
+		log.Printf("failed to apply database migrations: %v", merr)
+		os.Exit(1)
 	}
 	log.Printf("database migrations applied - schema version %d", version)
 
@@ -51,30 +53,37 @@ func main() {
 	// "public" schema (schema-per-service, GAP-01).
 	poolURL, perr := migrations.ConnectionURL(databaseURL)
 	if perr != nil {
-		log.Fatalf("failed to build schema-scoped connection URL: %v", perr)
+		log.Printf("failed to build schema-scoped connection URL: %v", perr)
+		os.Exit(1)
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	pool, err := pgxpool.New(ctx, poolURL)
 	if err != nil {
-		log.Fatalf("failed to connect to database: %v", err)
+		log.Printf("failed to connect to database: %v", err)
+		os.Exit(1)
 	}
 	defer pool.Close()
 
 	if err := pool.Ping(ctx); err != nil {
-		log.Fatalf("failed to ping database: %v", err)
+		log.Printf("failed to ping database: %v", err)
+		pool.Close()
+		os.Exit(1)
 	}
 	log.Println("database connection established")
 
 	repo, err := repository.New(pool, encKey)
 	if err != nil {
-		log.Fatalf("failed to initialize repository: %v", err)
+		log.Printf("failed to initialize repository: %v", err)
+		pool.Close()
+		os.Exit(1)
 	}
 	srv := server.New(repo)
 
 	log.Printf("keychain-service starting on port %s", port)
 	if err := srv.Run(":" + port); err != nil {
-		log.Fatalf("server failed: %v", err)
+		log.Printf("server failed: %v", err)
+		return
 	}
 }

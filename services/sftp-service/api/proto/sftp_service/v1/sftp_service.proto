@@ -1,17 +1,533 @@
 syntax = "proto3";
-
 package sftp_service.v1;
-
 option go_package = "github.com/helixdevelopment/sftp-service/api/proto/sftp_service/v1;sftp_servicev1";
 
-// TODO: define service RPCs and messages
-
-service SftpServiceService {
-	rpc HealthCheck (HealthCheckRequest) returns (HealthCheckResponse);
+import "google/protobuf/timestamp.proto";
+service SftpService {
+  rpc ListFiles(ListFilesRequest) returns (ListFilesResponse);
+  rpc UploadFile(stream UploadFileRequest) returns (UploadFileResponse);
+  rpc DownloadFile(DownloadFileRequest) returns (stream DownloadFileResponse);
+  rpc DeleteFile(DeleteFileRequest) returns (DeleteFileResponse);
+  rpc MoveFile(MoveFileRequest) returns (MoveFileResponse);
+  rpc CopyFile(CopyFileRequest) returns (CopyFileResponse);
+  rpc CreateDirectory(CreateDirectoryRequest) returns (CreateDirectoryResponse);
+  rpc DeleteDirectory(DeleteDirectoryRequest) returns (DeleteDirectoryResponse);
+  rpc GetFileInfo(GetFileInfoRequest) returns (GetFileInfoResponse);
+  rpc SetFilePermissions(SetFilePermissionsRequest) returns (SetFilePermissionsResponse);
+  rpc SetFileOwner(SetFileOwnerRequest) returns (SetFileOwnerResponse);
+  rpc SearchFiles(SearchFilesRequest) returns (SearchFilesResponse);
+  rpc WatchDirectory(WatchDirectoryRequest) returns (stream WatchDirectoryResponse);
+  rpc SyncDirectory(SyncDirectoryRequest) returns (stream SyncDirectoryResponse);
+  rpc GetDiskUsage(GetDiskUsageRequest) returns (GetDiskUsageResponse);
+  rpc BulkDeleteFiles(BulkDeleteFilesRequest) returns (BulkDeleteFilesResponse);
+  rpc CompressFiles(CompressFilesRequest) returns (CompressFilesResponse);
+  rpc ExtractArchive(ExtractArchiveRequest) returns (ExtractArchiveResponse);
+  rpc CalculateChecksum(CalculateChecksumRequest) returns (CalculateChecksumResponse);
+  rpc GetFilePreview(GetFilePreviewRequest) returns (GetFilePreviewResponse);
+  rpc CompareFiles(CompareFilesRequest) returns (CompareFilesResponse);
+  rpc TransferFile(TransferFileRequest) returns (stream TransferFileResponse);
+  rpc GetTransferStatus(GetTransferStatusRequest) returns (GetTransferStatusResponse);
+  rpc CancelTransfer(CancelTransferRequest) returns (CancelTransferResponse);
 }
 
-message HealthCheckRequest {}
-
-message HealthCheckResponse {
-	bool healthy = 1;
+message FileInfo {
+  string path = 1;
+  string name = 2;
+  int64 size = 3;
+  string type = 4;
+  string permissions = 5;
+  string owner = 6;
+  string group = 7;
+  google.protobuf.Timestamp modified_at = 8;
+  google.protobuf.Timestamp created_at = 9;
+  string checksum = 10;
 }
+
+message ListFilesRequest {
+  string session_id = 1;
+  string path = 2;
+  bool recursive = 3;
+  string filter = 4;
+}
+
+message ListFilesResponse {
+  repeated FileInfo files = 1;
+  string current_path = 2;
+}
+
+message UploadFileRequest {
+  string session_id = 1;
+  string path = 2;
+  string filename = 3;
+  bytes chunk = 4;
+  int64 offset = 5;
+  bool is_last = 6;
+  string checksum = 7;
+}
+
+message DownloadFileRequest {
+  string session_id = 1;
+  string path = 2;
+  int64 offset = 3;
+  int64 limit = 4;
+}
+
+message DownloadFileResponse {
+  bytes chunk = 1;
+  int64 offset = 2;
+  bool is_last = 3;
+  string checksum = 4;
+}
+
+message DeleteFileRequest {
+  string session_id = 1;
+  string path = 2;
+  bool force = 3;
+}
+
+message MoveFileRequest {
+  string session_id = 1;
+  string source_path = 2;
+  string destination_path = 3;
+  bool overwrite = 4;
+}
+
+message CopyFileRequest {
+  string session_id = 1;
+  string source_path = 2;
+  string destination_path = 3;
+  bool overwrite = 4;
+}
+
+message CreateDirectoryRequest {
+  string session_id = 1;
+  string path = 2;
+  string permissions = 3;
+  bool parents = 4;
+}
+
+message DeleteDirectoryRequest {
+  string session_id = 1;
+  string path = 2;
+  bool recursive = 3;
+}
+
+message GetFileRequest {
+  string session_id = 1;
+  string path = 2;
+}
+
+message SetFilePermissionsRequest {
+  string session_id = 1;
+  string path = 2;
+  string permissions = 3;
+  bool recursive = 4;
+}
+
+message SetFileOwnerRequest {
+  string session_id = 1;
+  string path = 2;
+  string owner = 3;
+  string group = 4;
+  bool recursive = 5;
+}
+
+message SearchFilesRequest {
+  string session_id = 1;
+  string path = 2;
+  string query = 3;
+  bool recursive = 4;
+  string type_filter = 5;
+  int64 min_size = 6;
+  int64 max_size = 7;
+  google.protobuf.Timestamp modified_after = 8;
+  google.protobuf.Timestamp modified_before = 9;
+}
+
+message WatchDirectoryRequest {
+  string session_id = 1;
+  string path = 2;
+  bool recursive = 3;
+  repeated string event_types = 4;
+}
+
+message FileEvent {
+  string event_type = 1;
+  string path = 2;
+  FileInfo file_info = 3;
+  google.protobuf.Timestamp timestamp = 4;
+}
+
+message SyncDirectoryRequest {
+  string session_id = 1;
+  string source_path = 2;
+  string destination_path = 3;
+  bool delete_missing = 4;
+  string conflict_resolution = 5;
+}
+
+message SyncProgress {
+  int32 total_files = 1;
+  int32 completed_files = 2;
+  int64 total_bytes = 3;
+  int64 transferred_bytes = 4;
+  string current_file = 5;
+  string status = 6;
+}
+
+message GetDiskUsageRequest {
+  string session_id = 1;
+  string path = 2;
+}
+
+message DiskUsage {
+  string path = 1;
+  int64 total_bytes = 2;
+  int64 used_bytes = 3;
+  int64 free_bytes = 4;
+  float usage_percent = 5;
+}
+
+message BulkDeleteFilesRequest {
+  string session_id = 1;
+  repeated string paths = 2;
+  bool force = 3;
+}
+
+message BulkDeleteFilesResponse {
+  repeated string deleted = 1;
+  repeated string failed = 2;
+  int32 total = 3;
+}
+
+message CompressFilesRequest {
+  string session_id = 1;
+  repeated string source_paths = 2;
+  string destination_path = 3;
+  string format = 4;
+  int32 compression_level = 5;
+}
+
+message ExtractArchiveRequest {
+  string session_id = 1;
+  string archive_path = 2;
+  string destination_path = 3;
+  string password = 4;
+}
+
+message CalculateChecksumRequest {
+  string session_id = 1;
+  string path = 2;
+  string algorithm = 3;
+}
+
+message ChecksumResult {
+  string path = 1;
+  string algorithm = 2;
+  string checksum = 3;
+}
+
+message FilePreview {
+  string path = 1;
+  string content_type = 2;
+  bytes preview_data = 3;
+  int64 total_size = 4;
+  int32 preview_lines = 5;
+}
+
+message CompareFilesRequest {
+  string session_id = 1;
+  string path_a = 2;
+  string path_b = 3;
+  string algorithm = 4;
+}
+
+message FileComparison {
+  bool identical = 1;
+  int64 differences_count = 2;
+  repeated FileDiff diffs = 3;
+}
+
+message FileDiff {
+  int64 offset = 1;
+  bytes data_a = 2;
+  bytes data_b = 3;
+}
+
+message TransferFileRequest {
+  string source_session_id = 1;
+  string destination_session_id = 2;
+  string source_path = 3;
+  string destination_path = 4;
+  bool overwrite = 5;
+}
+
+message TransferProgress {
+  int64 total_bytes = 1;
+  int64 transferred_bytes = 2;
+  float percent_complete = 3;
+  string status = 4;
+  string current_file = 5;
+}
+
+message GetTransferRequest {
+  string transfer_id = 1;
+}
+
+message TransferStatus {
+  string id = 1;
+  string status = 2;
+  int64 total_bytes = 3;
+  int64 transferred_bytes = 4;
+  float percent_complete = 5;
+  google.protobuf.Timestamp started_at = 6;
+  google.protobuf.Timestamp completed_at = 7;
+  string error = 8;
+}
+
+message CancelTransferRequest {
+  string transfer_id = 1;
+}
+
+message DeleteFileResponse {
+
+}
+
+message MoveFileResponse {
+
+  string path = 1;
+  string name = 2;
+  int64 size = 3;
+  string type = 4;
+  string permissions = 5;
+  string owner = 6;
+  string group = 7;
+  google.protobuf.Timestamp modified_at = 8;
+  google.protobuf.Timestamp created_at = 9;
+  string checksum = 10;
+}
+
+message CopyFileResponse {
+
+  string path = 1;
+  string name = 2;
+  int64 size = 3;
+  string type = 4;
+  string permissions = 5;
+  string owner = 6;
+  string group = 7;
+  google.protobuf.Timestamp modified_at = 8;
+  google.protobuf.Timestamp created_at = 9;
+  string checksum = 10;
+}
+
+message CreateDirectoryResponse {
+
+  string path = 1;
+  string name = 2;
+  int64 size = 3;
+  string type = 4;
+  string permissions = 5;
+  string owner = 6;
+  string group = 7;
+  google.protobuf.Timestamp modified_at = 8;
+  google.protobuf.Timestamp created_at = 9;
+  string checksum = 10;
+}
+
+message DeleteDirectoryResponse {
+
+}
+
+message GetFileInfoResponse {
+
+  string path = 1;
+  string name = 2;
+  int64 size = 3;
+  string type = 4;
+  string permissions = 5;
+  string owner = 6;
+  string group = 7;
+  google.protobuf.Timestamp modified_at = 8;
+  google.protobuf.Timestamp created_at = 9;
+  string checksum = 10;
+}
+
+message SetFilePermissionsResponse {
+
+  string path = 1;
+  string name = 2;
+  int64 size = 3;
+  string type = 4;
+  string permissions = 5;
+  string owner = 6;
+  string group = 7;
+  google.protobuf.Timestamp modified_at = 8;
+  google.protobuf.Timestamp created_at = 9;
+  string checksum = 10;
+}
+
+message SetFileOwnerResponse {
+
+  string path = 1;
+  string name = 2;
+  int64 size = 3;
+  string type = 4;
+  string permissions = 5;
+  string owner = 6;
+  string group = 7;
+  google.protobuf.Timestamp modified_at = 8;
+  google.protobuf.Timestamp created_at = 9;
+  string checksum = 10;
+}
+
+message GetDiskUsageResponse {
+
+  string path = 1;
+  int64 total_bytes = 2;
+  int64 used_bytes = 3;
+  int64 free_bytes = 4;
+  float usage_percent = 5;
+}
+
+message CompressFilesResponse {
+
+  string path = 1;
+  string name = 2;
+  int64 size = 3;
+  string type = 4;
+  string permissions = 5;
+  string owner = 6;
+  string group = 7;
+  google.protobuf.Timestamp modified_at = 8;
+  google.protobuf.Timestamp created_at = 9;
+  string checksum = 10;
+}
+
+message ExtractArchiveResponse {
+
+  string path = 1;
+  string name = 2;
+  int64 size = 3;
+  string type = 4;
+  string permissions = 5;
+  string owner = 6;
+  string group = 7;
+  google.protobuf.Timestamp modified_at = 8;
+  google.protobuf.Timestamp created_at = 9;
+  string checksum = 10;
+}
+
+message CalculateChecksumResponse {
+
+  string path = 1;
+  string algorithm = 2;
+  string checksum = 3;
+}
+
+message GetFilePreviewResponse {
+
+  string path = 1;
+  string content_type = 2;
+  bytes preview_data = 3;
+  int64 total_size = 4;
+  int32 preview_lines = 5;
+}
+
+message CompareFilesResponse {
+
+  bool identical = 1;
+  int64 differences_count = 2;
+  repeated FileDiff diffs = 3;
+}
+
+message GetTransferStatusResponse {
+
+  string id = 1;
+  string status = 2;
+  int64 total_bytes = 3;
+  int64 transferred_bytes = 4;
+  float percent_complete = 5;
+  google.protobuf.Timestamp started_at = 6;
+  google.protobuf.Timestamp completed_at = 7;
+  string error = 8;
+}
+
+message CancelTransferResponse {
+
+}
+message UploadFileResponse {
+
+  string session_id = 1;
+  string path = 2;
+  bool recursive = 3;
+  string filter = 4;
+
+}
+
+message GetFileInfoRequest {
+
+  string session_id = 1;
+  string path = 2;
+  string permissions = 3;
+  bool recursive = 4;
+
+}
+
+message SearchFilesResponse {
+
+  string session_id = 1;
+  string path = 2;
+  string filename = 3;
+  bytes chunk = 4;
+  int64 offset = 5;
+  bool is_last = 6;
+  string checksum = 7;
+
+}
+
+message WatchDirectoryResponse {
+
+  string session_id = 1;
+  string source_path = 2;
+  string destination_path = 3;
+  bool delete_missing = 4;
+  string conflict_resolution = 5;
+
+}
+
+message SyncDirectoryResponse {
+
+  string session_id = 1;
+  string path = 2;
+
+}
+
+message GetFilePreviewRequest {
+
+  string session_id = 1;
+  string path = 2;
+  string permissions = 3;
+  bool recursive = 4;
+
+}
+
+message TransferFileResponse {
+
+  string transfer_id = 1;
+
+}
+
+message GetTransferStatusRequest {
+
+  string id = 1;
+  string status = 2;
+  int64 total_bytes = 3;
+  int64 transferred_bytes = 4;
+  float percent_complete = 5;
+  google.protobuf.Timestamp started_at = 6;
+  google.protobuf.Timestamp completed_at = 7;
+  string error = 8;
+
+}
+

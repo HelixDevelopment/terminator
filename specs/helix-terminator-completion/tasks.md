@@ -64,11 +64,11 @@
 
 - [ ] T026 [P] Replace placeholder `migrations/001_init.up.sql` with complete schema per service, aligned with `docs/research/mvp/final/implementation/backend/<service>_db.sql` for all 25 services
 - [ ] T027 [P] Add `migrations/001_init.down.sql` rollback scripts for all 25 services
-- [ ] T028 Apply all migrations to PostgreSQL 17.2 in rootless podman; capture schema in `specs/helix-terminator-completion/research.md`
+- [X] T028 Apply all migrations to PostgreSQL 17.2 in rootless podman; capture schema in `specs/helix-terminator-completion/research.md`
 - [ ] T029 Encrypt `private_key` and `passphrase` storage in `services/keychain-service/` schema and repository
 - [ ] T030 Add pre-store credential leak audit automation to CI or pre-commit
-- [ ] T031 [P] Replace placeholder `// TODO: define service RPCs and messages` in all 25 `.proto` files with real RPCs and messages from `docs/research/mvp/final/implementation/04-api-specification/`
-- [ ] T032 Run `buf lint` and `protoc` compile for all proto services; ensure no drift with Go structs
+- [X] T031 [P] Replace placeholder `// TODO: define service RPCs and messages` in all 25 `.proto` files with real RPCs and messages from `docs/research/mvp/final/implementation/04-api-specification/`
+- [X] T032 Run `buf lint` and `protoc` compile for all proto services; ensure no drift with Go structs
 - [ ] T033 Update `docs/research/mvp/final/implementation/api/openapi.yaml` to cover WebSocket streams and gRPC gateway mappings
 - [ ] T034 Document honestly any gRPC/WS endpoints remaining uncovered by OpenAPI
 
@@ -80,24 +80,24 @@
 
 **Purpose**: Close CRITICAL/HIGH security gaps and satisfy constitution security clauses.
 
-- [ ] T035 [P] Populate `infrastructure/security/falco/README.md` with real Falco rules
-- [ ] T036 [P] Populate `infrastructure/security/cosign/README.md` with signing/verification policy
-- [ ] T037 [P] Populate `infrastructure/security/sealed-secrets/README.md` with SealedSecret templates
-- [ ] T038 [P] Expand `infrastructure/security/trivy/README.md` with CI scanning steps
-- [ ] T039 [P] Write `docs/runbooks/certificate-rotation.md` from `docs/research/mvp/final/implementation/05-security-zero-trust/README.md`
-- [ ] T040 [P] Write `docs/runbooks/failover-procedure.md`
-- [ ] T041 [P] Write `docs/runbooks/incident-response.md`
-- [ ] T042 [P] Write `docs/runbooks/key-rotation.md`
-- [ ] T043 [P] Write `docs/runbooks/postgres-pitr-restore.md`
-- [ ] T044 Pin image tags + SHA-256 digests in `infrastructure/helm/helixterm/values.yaml`
-- [ ] T045 Switch to `pullPolicy: Always` where digest-pinned in Helm values
+- [X] T035 [P] Populate `infrastructure/security/falco/README.md` with real Falco rules
+- [X] T036 [P] Populate `infrastructure/security/cosign/README.md` with signing/verification policy
+- [X] T037 [P] Populate `infrastructure/security/sealed-secrets/README.md` with SealedSecret templates
+- [X] T038 [P] Expand `infrastructure/security/trivy/README.md` with CI scanning steps
+- [X] T039 [P] Write `docs/runbooks/certificate-rotation.md` from `docs/research/mvp/final/implementation/05-security-zero-trust/README.md`
+- [X] T040 [P] Write `docs/runbooks/failover-procedure.md`
+- [X] T041 [P] Write `docs/runbooks/incident-response.md`
+- [X] T042 [P] Write `docs/runbooks/key-rotation.md`
+- [X] T043 [P] Write `docs/runbooks/postgres-pitr-restore.md`
+- [X] T044 Pin image tags + SHA-256 digests in `infrastructure/helm/helixterm/values.yaml`
+- [X] T045 Switch to `pullPolicy: Always` where digest-pinned in Helm values
 - [ ] T046 Convert umbrella `infrastructure/helm/helixterm/Chart.yaml` into per-service subcharts
 - [ ] T047 Set HA replica counts per environment in `values-staging.yaml` / `values-production.yaml`
-- [ ] T048 Add fine-grained `NetworkPolicy` allow rules in `infrastructure/helm/helixterm/templates/`
-- [ ] T049 Enforce Pod Security Standards (restricted) in Helm chart
+- [X] T048 Add fine-grained `NetworkPolicy` allow rules in `infrastructure/helm/helixterm/templates/`
+- [X] T049 Enforce Pod Security Standards (restricted) in Helm chart
 - [ ] T050 [P] Wire shared JWT/SPIFFE/RBAC middleware into every service beyond gateway and auth
-- [ ] T051 [P] Replace `log.Fatalf` with structured logger + graceful shutdown in `services/ai-service/`, `billing-service/`, `keychain-service/`, `user-service/`, `workspace-service/`
-- [ ] T052 [P] Standardize all services on `/healthz/live` + `/healthz/ready` with real dependency checks
+- [X] T051 [P] Replace `log.Fatalf` with structured logger + graceful shutdown in `services/ai-service/`, `billing-service/`, `keychain-service/`, `user-service/`, `workspace-service/`
+- [X] T052 [P] Standardize all services on `/healthz/live` + `/healthz/ready` with real dependency checks
 
 **Checkpoint**: Security runbooks and configs populated; Helm hardened; auth middleware fleet-wide; graceful startup and standard health endpoints.
 
@@ -128,15 +128,15 @@
 
 **Purpose**: Make Terraform, Helm, Kustomize, and CI/CD production-ready.
 
-- [ ] T065 Validate + plan all Terraform modules and environments via container
-- [ ] T066 Reconcile modified Terraform modules: eks, elasticache, iam, msk, rds
+- [X] T065 Validate + plan all Terraform modules and environments via container
+- [X] T066 Reconcile modified Terraform modules: eks, elasticache, iam, msk, rds
+- [X] T073 Update `.github/workflows/main.yml` and `.github/workflows/nightly.yml` Go version to 1.25+
 - [ ] T067 Run `helm lint` and `helm template` for `infrastructure/helm/helixterm/`
 - [ ] T068 Ensure `values-staging.yaml`, `values-production.yaml`, and base `values.yaml` are consistent
 - [ ] T069 Run `kustomize build` for base, dev, staging, production overlays
 - [ ] T070 Boot PostgreSQL, Redis, and Kafka via rootless podman compose with healthchecks
 - [ ] T071 Verify all services start against the local stack
 - [ ] T072 Decide CI re-enable vs. stay disabled per §11.4.156 and document with evidence
-- [ ] T073 Update `.github/workflows/main.yml` and `.github/workflows/nightly.yml` Go version to 1.25+
 - [ ] T074 Fix or remove references to `test/banks/unit/...`, `test/banks/integration/...`, `test/e2e`, `test/integration` in CI workflows
 
 **Checkpoint**: Validated Terraform/Helm/Kustomize; local stack boots; CI paths corrected and compliant.
@@ -147,16 +147,16 @@
 
 **Purpose**: Replace stub tests, implement core terminal view, and wire design system.
 
-- [ ] T075 Use rootless podman Flutter 3.24 image; run `flutter pub get` in `clients/flutter/`
-- [ ] T076 Run `flutter analyze` in `clients/flutter/` and drive to 0 issues
-- [ ] T077 Implement real `clients/flutter/lib/terminal_view.dart` and add terminal/SSH package to `pubspec.yaml`
+- [X] T075 Use rootless podman Flutter 3.24 image; run `flutter pub get` in `clients/flutter/`
+- [X] T076 Run `flutter analyze` in `clients/flutter/` and drive to 0 issues
+- [X] T077 Implement real `clients/flutter/lib/terminal_view.dart` and add terminal/SSH package to `pubspec.yaml`
 - [ ] T078 [P] Replace ~30 placeholder stubs and ~110 demo wrappers in `clients/flutter/lib/` with real implementations or remove
-- [ ] T079 [P] Add JSON serialization to the 4 models missing it in `clients/flutter/lib/`
-- [ ] T080 Wire `clients/flutter/design_system/` tokens/theme into `lib/` with light+dark variants
-- [ ] T081 [P] Replace 8 stub BLoC tests in `clients/flutter/test/` with real tests
+- [X] T079 [P] Add JSON serialization to the 4 models missing it in `clients/flutter/lib/`
+- [X] T080 Wire `clients/flutter/design_system/` tokens/theme into `lib/` with light+dark variants
+- [X] T081 [P] Replace 8 stub BLoC tests in `clients/flutter/test/` with real tests
 - [ ] T082 Generate host-rendered golden images for every screen×state×{light,dark} in `clients/flutter/test/`
 - [ ] T083 Dual-validate golden images with diff + OCR/vision oracle per §11.4.170
-- [ ] T084 Replace boot-only `clients/flutter/integration_test/app_test.dart` with real end-to-end user journey tests
+- [X] T084 Replace boot-only `clients/flutter/integration_test/app_test.dart` with real end-to-end user journey tests
 
 **Checkpoint**: Real terminal view, zero prod TODOs, design system wired, all bloc/integration tests real, visual proofs captured.
 
@@ -166,7 +166,7 @@
 
 **Purpose**: Wire real metrics, traces, logs, and alerts.
 
-- [ ] T085 [P] Instrument all 25 services with Prometheus RED metrics
+- [X] T085 [P] Instrument all 25 services with Prometheus RED metrics
 - [ ] T086 Verify Prometheus scrape endpoints and target health locally
 - [ ] T087 Propagate `X-Request-ID`/trace context across services and verify spans in local Jaeger
 - [ ] T088 Ensure JSON structured logs with PII redaction in all 25 services

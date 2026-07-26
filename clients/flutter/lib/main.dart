@@ -39,7 +39,7 @@ import 'services/workspace_service.dart';
 import 'screens/splash_screen.dart';
 
 void main() {
-  // TODO: initialize dependency injection, logging, analytics
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const HelixTerminatorApp());
 }
 
