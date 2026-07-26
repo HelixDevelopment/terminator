@@ -4,14 +4,63 @@ package ai_service.v1;
 
 option go_package = "github.com/helixdevelopment/ai-service/api/proto/ai_service/v1;ai_servicev1";
 
-// TODO: define service RPCs and messages
+import "google/protobuf/timestamp.proto";
 
+// AiServiceService exposes CRUD operations for AI completion requests.
 service AiServiceService {
-	rpc HealthCheck (HealthCheckRequest) returns (HealthCheckResponse);
+  rpc CreateRequest (CreateRequestRequest) returns (CreateRequestResponse);
+  rpc GetRequest (GetRequestRequest) returns (GetRequestResponse);
+  rpc ListRequests (ListRequestsRequest) returns (ListRequestsResponse);
+  rpc HealthCheck (HealthCheckRequest) returns (HealthCheckResponse);
+}
+
+message CreateRequestRequest {
+  string prompt = 1;
+  string context = 2;
+  string model = 3;
+  int32 max_tokens = 4;
+  double temperature = 5;
+}
+
+message CreateRequestResponse {
+  AIRequest request = 1;
+}
+
+message GetRequestRequest {
+  string id = 1;
+}
+
+message GetRequestResponse {
+  AIRequest request = 1;
+}
+
+message ListRequestsRequest {
+  string user_id = 1;
+  int32 limit = 2;
+  int32 offset = 3;
+}
+
+message ListRequestsResponse {
+  repeated AIRequest items = 1;
+  int32 total = 2;
+  int32 limit = 3;
+  int32 offset = 4;
+}
+
+message AIRequest {
+  string id = 1;
+  string user_id = 2;
+  string org_id = 3;
+  string prompt = 4;
+  string response = 5;
+  string model = 6;
+  int32 tokens_used = 7;
+  string status = 8;
+  google.protobuf.Timestamp created_at = 9;
 }
 
 message HealthCheckRequest {}
 
 message HealthCheckResponse {
-	bool healthy = 1;
+  bool healthy = 1;
 }
