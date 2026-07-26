@@ -19,13 +19,13 @@
 
 **Purpose**: Establish verified baseline and resolve unknowns before touching production code.
 
-- [ ] T001 Run constitution inheritance gate `tests/verify_constitution_inheritance.sh` and record evidence in `specs/helix-terminator-completion/research.md`
-- [ ] T002 Run mutation proof `scripts/testing/meta_test_false_positive_proof.sh` and record evidence in `specs/helix-terminator-completion/research.md`
-- [ ] T003 [P] Run `go vet ./...` and `go test ./...` for all 25 services; capture per-service pass/fail in `specs/helix-terminator-completion/research.md`
-- [ ] T004 [P] Inventory exact counts of stub tests, integration tests, stress/chaos tests, proto files, and migrations; record in `specs/helix-terminator-completion/research.md`
-- [ ] T005 Verify availability of Go, podman, buf, protoc, k6, helm, terraform, kustomize, Flutter SDK; document containerized fallback or SKIP in `specs/helix-terminator-completion/research.md`
-- [ ] T006 [P] Reconcile gateway `notImplemented` routes against MVP scope; document in-scope / out-of-scope / operator-blocked decisions in `specs/helix-terminator-completion/research.md`
-- [ ] T007 [P] Reconcile operator-blocked items (Stripe TEST keys, Slack token, SMTP relay, etc.) in `specs/helix-terminator-completion/research.md`
+- [X] T001 Run constitution inheritance gate `tests/verify_constitution_inheritance.sh` and record evidence in `specs/helix-terminator-completion/research.md`
+- [X] T002 Run mutation proof `scripts/testing/meta_test_false_positive_proof.sh` and record evidence in `specs/helix-terminator-completion/research.md`
+- [X] T003 [P] Run `go vet ./...` and `go test ./...` for all 25 services; capture per-service pass/fail in `specs/helix-terminator-completion/research.md`
+- [X] T004 [P] Inventory exact counts of stub tests, integration tests, stress/chaos tests, proto files, and migrations; record in `specs/helix-terminator-completion/research.md`
+- [X] T005 Verify availability of Go, podman, buf, protoc, k6, helm, terraform, kustomize, Flutter SDK; document containerized fallback or SKIP in `specs/helix-terminator-completion/research.md`
+- [X] T006 [P] Reconcile gateway `notImplemented` routes against MVP scope; document in-scope / out-of-scope / operator-blocked decisions in `specs/helix-terminator-completion/research.md`
+- [X] T007 [P] Reconcile operator-blocked items (Stripe TEST keys, Slack token, SMTP relay, etc.) in `specs/helix-terminator-completion/research.md`
 
 **Checkpoint**: `research.md` is complete and all unknowns are resolved or explicitly operator-blocked.
 
@@ -35,8 +35,8 @@
 
 **Purpose**: Remove foundational blockers and make the gateway route surface functional.
 
-- [ ] T008 Fix `submodules/helixtrack-core/Website/Upstreamable` nested submodule URL or remove orphan; verify with `git submodule update --init --recursive`
-- [ ] T009 Add `submodules/open-design` gitlink to parent index with `git add submodules/open-design`
+- [X] T008 Fix `submodules/helixtrack-core/Website/Upstreamable` nested submodule URL or remove orphan; verify with `git submodule update --init --recursive`
+- [X] T009 Add `submodules/open-design` gitlink to parent index with `git add submodules/open-design`
 - [ ] T010 Commit updated submodule pointers for `constitution`, `containers`, `helixllm`, `helixqa`
 - [ ] T011 [P] Implement upstream `/me`, `/me/sessions`, `/me/preferences` endpoints in `services/user-service/` and wire into `services/gateway-service/internal/server/server.go`
 - [ ] T012 [P] Implement vault items and share endpoints in `services/vault-service/` and wire into gateway
@@ -107,18 +107,18 @@
 
 **Purpose**: Eliminate stub tests and add integration/stress/chaos coverage fleet-wide.
 
-- [ ] T053 [P] Replace `t.Skip` placeholders in `services/ai-service/cmd/ai-service/main_test.go`, `internal/model/model_test.go`, `internal/repository/repository_test.go`, `internal/server/server_test.go`
-- [ ] T054 [P] Replace `t.Skip` placeholders in `services/billing-service/cmd/billing-service/main_test.go`, `internal/model/model_test.go`, `internal/repository/repository_test.go`, `internal/server/server_test.go`
-- [ ] T055 [P] Replace `t.Skip` placeholders in `services/keychain-service/cmd/keychain-service/main_test.go`, `internal/model/model_test.go`, `internal/repository/repository_test.go`
-- [ ] T056 [P] Replace `t.Skip` placeholders in `services/user-service/cmd/user-service/main_test.go`, `internal/model/model_test.go`, `internal/repository/repository_test.go`, `internal/server/server_test.go`
-- [ ] T057 [P] Replace `t.Skip` placeholders in `services/gateway-service/cmd/gateway-service/main_test.go`, `internal/model/model_test.go`, `internal/repository/repository_test.go`
-- [ ] T058 [P] Replace 2 tautology tests in `services/notification-service/cmd/notification-service/main_test.go` and `internal/model/model_test.go`
-- [ ] T059 [P] Replace remaining `t.Skip` placeholders across all other services
-- [ ] T060 [P] Add integration tests for analytics-service, audit-service, collaboration-service, config-service, health-service, helixtrack-bridge-service, host-service, org-service, recording-service, sftp-service, snippet-service, ssh-proxy-service, terminal-service, workspace-service, ai-service
-- [ ] T061 [P] Add `handler_stress_test.go` (gated `//go:build stress`) to each of the 24 services without stress coverage
-- [ ] T062 [P] Add `handler_chaos_test.go` (gated `//go:build chaos`) to each of the 24 services without chaos coverage
-- [ ] T063 Fix `scripts/generate_test_banks.go` to generate real test bodies
-- [ ] T064 Regenerate `test/banks/unit/` and `test/banks/integration/` with real tests or remove unrunnable banks
+- [X] T053 [P] Replace `t.Skip` placeholders in `services/ai-service/cmd/ai-service/main_test.go`, `internal/model/model_test.go`, `internal/repository/repository_test.go`, `internal/server/server_test.go`
+- [X] T054 [P] Replace `t.Skip` placeholders in `services/billing-service/cmd/billing-service/main_test.go`, `internal/model/model_test.go`, `internal/repository/repository_test.go`, `internal/server/server_test.go`
+- [X] T055 [P] Replace `t.Skip` placeholders in `services/keychain-service/cmd/keychain-service/main_test.go`, `internal/model/model_test.go`, `internal/repository/repository_test.go`
+- [X] T056 [P] Replace `t.Skip` placeholders in `services/user-service/cmd/user-service/main_test.go`, `internal/model/model_test.go`, `internal/repository/repository_test.go`, `internal/server/server_test.go`
+- [X] T057 [P] Replace `t.Skip` placeholders in `services/gateway-service/cmd/gateway-service/main_test.go`, `internal/model/model_test.go`, `internal/repository/repository_test.go`
+- [X] T058 [P] Replace 2 tautology tests in `services/notification-service/cmd/notification-service/main_test.go` and `internal/model/model_test.go`
+- [X] T059 [P] Replace remaining `t.Skip` placeholders across all other services
+- [X] T060 [P] Add integration tests for analytics-service, audit-service, collaboration-service, config-service, health-service, helixtrack-bridge-service, host-service, org-service, recording-service, sftp-service, snippet-service, ssh-proxy-service, terminal-service, workspace-service, ai-service
+- [X] T061 [P] Add `handler_stress_test.go` (gated `//go:build stress`) to each of the 24 services without stress coverage
+- [X] T062 [P] Add `handler_chaos_test.go` (gated `//go:build chaos`) to each of the 24 services without chaos coverage
+- [X] T063 Fix `scripts/generate_test_banks.go` to generate real test bodies
+- [X] T064 Regenerate `test/banks/unit/` and `test/banks/integration/` with real tests or remove unrunnable banks
 
 **Checkpoint**: Zero stub tests; integration tests in all 25 services; stress/chaos tests in all 25 services; real test banks.
 
