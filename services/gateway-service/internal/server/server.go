@@ -15,6 +15,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/gorilla/websocket"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 // Claims represents custom JWT claims for gateway validation.
@@ -1003,9 +1005,7 @@ func (s *Server) fullHealthHandler(c *gin.Context) {
 }
 
 func (s *Server) metricsHandler(c *gin.Context) {
-	// TODO: integrate with Prometheus client
-	c.Header("Content-Type", "text/plain")
-	c.String(http.StatusOK, "# Gateway metrics\n# TODO: implement Prometheus metrics\n")
+	promhttp.Handler().ServeHTTP(c.Writer, c.Request)
 }
 
 func (s *Server) openapiHandler(c *gin.Context) {
@@ -1014,8 +1014,79 @@ func (s *Server) openapiHandler(c *gin.Context) {
 }
 
 func (s *Server) terminalWebSocketHandler(c *gin.Context) {
-	// TODO: implement WebSocket proxy to terminal-service
-	c.JSON(http.StatusNotImplemented, gin.H{"error": "WebSocket terminal not yet implemented"})
+	// Proxy the WebSocket connection to terminal-service. If terminal-service
+	// is unreachable, report an honest 502 instead of a fabricated 200 or a
+	// silent disconnect.
+	up, ok := s.getUpstream("terminal-service")
+	if !ok {
+		c.JSON(http.StatusBadGateway, gin.H{"error": "terminal-service upstream unavailable"})
+		return
+	}
+
+	terminalURL := strings.TrimRight(up.Address, "/") + "/ws/terminal/" + url.PathEscape(c.Param("sessionId"))
+	s.proxyWebSocket(c, terminalURL)
+}
+
+func (s *Server) proxyWebSocket(c *gin.Context, targetURL string) {
+	var upgrader = websocket.Upgrader{
+		CheckOrigin: func(r *http.Request) bool { return true },
+	}
+
+	clientConn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
+	if err != nil {
+		// upgrader.Upgrade already writes the HTTP error response.
+		return
+	}
+	defer clientConn.Close()
+
+	header := http.Header{}
+	copyHeaders(c.Request.Header, header, "X-Request-ID")
+	dialer := websocket.Dialer{HandshakeTimeout: 5 * time.Second}
+	upstreamConn, resp, err := dialer.Dial(targetURL, header)
+	if err != nil {
+		msg := "upstream websocket unavailable"
+		if resp != nil && resp.StatusCode >= 400 {
+			msg = fmt.Sprintf("upstream websocket returned HTTP %d", resp.StatusCode)
+		}
+		clientConn.WriteControl(websocket.CloseInternalServerErr, []byte(msg), time.Now().Add(2*time.Second))
+		return
+	}
+	defer upstreamConn.Close()
+
+	// Bridge client <-> upstream until either side closes.
+	errCh := make(chan error, 2)
+	go copyWS(upstreamConn, clientConn, errCh)
+	go copyWS(clientConn, upstreamConn, errCh)
+	<-errCh
+}
+
+func copyWS(dst, src *websocket.Conn, errCh chan<- error) {
+	for {
+		mt, p, err := src.ReadMessage()
+		if err != nil {
+			errCh <- err
+			return
+		}
+		if err := dst.WriteMessage(mt, p); err != nil {
+			errCh <- err
+			return
+		}
+	}
+}
+
+func copyHeaders(src http.Header, dst http.Header, names ...string) {
+	for _, name := range names {
+		if v := src.Get(name); v != "" {
+			dst.Set(name, v)
+		}
+	}
+}
+
+func (s *Server) getUpstream(name string) (*upstreamService, bool) {
+	s.upstreamsMu.RLock()
+	defer s.upstreamsMu.RUnlock()
+	u, ok := s.upstreams[name]
+	return u, ok
 }
 
 func (s *Server) ssoHandler(c *gin.Context) {
